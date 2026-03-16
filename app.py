@@ -30,7 +30,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 BACKEND_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = BACKEND_DIR.parent
-LEGACY_APP_PATH = PROJECT_ROOT / "app.py"
+LEGACY_APP_PATH = BACKEND_DIR / "legacy_reference_app.py"
 legacy_spec = importlib.util.spec_from_file_location("legacy_reference_app", LEGACY_APP_PATH)
 legacy_app = importlib.util.module_from_spec(legacy_spec)
 assert legacy_spec and legacy_spec.loader
