@@ -808,11 +808,12 @@ finally {{
 
 
 def require_api_key() -> str:
-    if not OPENAI_API_KEY:
+    api_key = os.getenv("OPENAI_API_KEY", "").strip() or OPENAI_API_KEY
+    if not api_key:
         raise RuntimeError(
             "OPENAI_API_KEY is missing. Add your API key to C:\\Users\\vctg6\\Downloads\\parasha-onepager-app\\.env."
         )
-    return OPENAI_API_KEY
+    return api_key
 
 
 def openai_headers() -> dict:
