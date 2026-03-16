@@ -1,0 +1,861 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Parasha Pamphlet Pipeline</title>
+  <style>
+    :root {
+      --bg: #f4f1e8;
+      --paper: #fffdf7;
+      --ink: #1f2933;
+      --accent: #8a5a2f;
+      --muted: #4b5563;
+      --border: #d9c9b4;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      background: radial-gradient(circle at top right, #efe2cb 0%, var(--bg) 45%, #ece7dd 100%);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      box-shadow: 0 6px 18px rgba(17, 24, 39, 0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      margin-bottom: 0.25rem;
+      font-size: 1.9rem;
+      color: #5a3a1f;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .row {
+      margin: 1rem 0;
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    input[type="file"] {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.45rem;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 220px;
+      box-sizing: border-box;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem;
+      font: inherit;
+      line-height: 1.45;
+      resize: vertical;
+    }
+
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover {
+      filter: brightness(1.05);
+    }
+
+    .error {
+      border: 1px solid #fecaca;
+      background: #fff1f2;
+      color: #9f1239;
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .panel {
+      margin-top: 1rem;
+      border-top: 1px solid var(--border);
+      padding-top: 0.75rem;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .status-card {
+      margin-top: 1rem;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #faf5ea;
+    }
+
+    .progress-shell {
+      height: 14px;
+      background: #e7dccb;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 0.75rem 0 0.5rem;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #8a5a2f 0%, #c28d51 100%);
+      transition: width 0.4s ease;
+    }
+
+    .status-line {
+      color: var(--ink);
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .status-meta {
+      color: var(--muted);
+      margin: 0.25rem 0 0;
+      font-size: 0.95rem;
+    }
+
+    .checklist {
+      margin-top: 1rem;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fbf7ef;
+    }
+
+    .checklist h2,
+    .review-card h2 {
+      margin-top: 0;
+      margin-bottom: 0.6rem;
+      color: #5a3a1f;
+    }
+
+    .field {
+      margin-bottom: 0.85rem;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 0.35rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .field input {
+      width: 100%;
+      box-sizing: border-box;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.65rem 0.75rem;
+      font-size: 1rem;
+    }
+
+    .helper {
+      margin: 0.15rem 0 0;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    .review-card {
+      margin-top: 1rem;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #f9f1e4;
+    }
+
+    .review-item {
+      padding: 0.85rem 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .review-item:first-of-type {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      margin-bottom: 0.45rem;
+      border-radius: 999px;
+      background: #ead7bd;
+      color: #5a3a1f;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .context {
+      margin: 0.35rem 0 0.6rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .suggestions {
+      margin: 0.35rem 0 0.6rem;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 0.75rem;
+    }
+
+    .editor-toolbar {
+      display: flex;
+      gap: 0.75rem;
+      align-items: end;
+      flex-wrap: wrap;
+      margin: 0.75rem 0;
+    }
+
+    .editor-toolbar .field {
+      margin-bottom: 0;
+      min-width: 180px;
+    }
+
+    .editor-toolbar select {
+      width: 100%;
+      box-sizing: border-box;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.65rem 0.75rem;
+      font-size: 1rem;
+    }
+
+    .download-link {
+      display: inline-block;
+      text-decoration: none;
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      background: #3f5f4a;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .download-link:hover {
+      filter: brightness(1.05);
+    }
+
+    pre {
+      background: #fbf8ef;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.9rem;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="card">
+      <h1>Parasha Pamphlet Pipeline</h1>
+      <p>Upload an <strong>.mp3</strong> or <strong>.mp4</strong>, paste a transcript, or paste a finished pamphlet for <strong>{{ shul_name }}</strong>. The app can review unclear Hebrew when needed, create a Rabbi-voice pamphlet of about {{ target_words }} words, and let you tune the export before download.</p>
+
+      <div id="error-box" class="error hidden"></div>
+
+      <form id="upload-form" action="/process" method="post" enctype="multipart/form-data">
+        <div class="row">
+          <input id="audio-input" type="file" name="audio" accept=".mp3,.mp4,audio/mpeg,video/mp4" />
+          <button id="submit-button" type="submit" disabled>Create Pamphlet</button>
+        </div>
+
+        <div class="field">
+          <label for="transcript-text">Or Paste Transcript</label>
+          <textarea id="transcript-text" name="transcript_text" placeholder="Paste a transcript here to skip audio upload and transcription while testing."></textarea>
+          <p class="helper">If a transcript is pasted, the app will use it directly and skip the audio transcription step.</p>
+        </div>
+
+        <div class="field">
+          <label for="pamphlet-input">Or Paste Finished Pamphlet</label>
+          <textarea id="pamphlet-input" name="pamphlet_text" placeholder="Paste finished pamphlet text here to skip transcription, review, and generation and go straight to editing and download."></textarea>
+          <p class="helper">This is the fastest testing loop for download/layout work.</p>
+        </div>
+
+        <div id="checklist-card" class="checklist hidden">
+          <h2>Quick Checklist</h2>
+          <div class="field">
+            <label for="rabbi-name">Rabbi Name</label>
+            <input id="rabbi-name" name="rabbi_name" type="text" placeholder="Rabbi..." />
+          </div>
+          <div class="field">
+            <label for="topic">Topic</label>
+            <input id="topic" name="topic" type="text" placeholder="This week's Torah topic..." />
+            <p class="helper">The pamphlet header will read: {{ shul_name }} / topic / by Rabbi name.</p>
+          </div>
+        </div>
+      </form>
+
+      <div id="status-card" class="status-card hidden" aria-live="polite">
+        <p id="status-line" class="status-line">Preparing your upload...</p>
+        <div class="progress-shell">
+          <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        <p id="status-meta" class="status-meta">0%</p>
+      </div>
+
+      <div id="review-card" class="review-card hidden">
+        <h2>Hebrew Clarification Review</h2>
+        <p>The transcript includes a few unclear Hebrew phrases. Fill these in so the final pamphlet can sound like the Rabbi's own voice.</p>
+        <form id="review-form">
+          <div id="review-items"></div>
+          <button id="review-submit" type="submit">Continue to Pamphlet</button>
+        </form>
+      </div>
+
+      <div id="one-pager-panel" class="panel{% if not one_pager %} hidden{% endif %}">
+        <h2>Pamphlet</h2>
+        <p class="helper">Edit the pamphlet text here before downloading. PDF line spacing, font size, and background can also be adjusted below.</p>
+        <div class="field">
+          <label for="pamphlet-title">Pamphlet Title</label>
+          <input id="pamphlet-title" type="text" value="" />
+        </div>
+        <div class="editor-toolbar">
+          <div class="field">
+            <label for="pdf-line-spacing">PDF Line Spacing</label>
+            <select id="pdf-line-spacing">
+              <option value="1.0">1.0</option>
+              <option value="1.15">1.15</option>
+              <option value="1.3">1.3</option>
+              <option value="1.5">1.5</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="pdf-font-size">PDF Font Size</label>
+            <select id="pdf-font-size">
+              <option value="0">Auto</option>
+              <option value="12">12</option>
+              <option value="11.5">11.5</option>
+              <option value="11">11</option>
+              <option value="10.5">10.5</option>
+              <option value="10">10</option>
+              <option value="9.5">9.5</option>
+              <option value="9">9</option>
+              <option value="8.5">8.5</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="pdf-background-mode">PDF Background</label>
+            <select id="pdf-background-mode">
+              <option value="default">Default</option>
+              <option value="blank">Blank</option>
+              <option value="custom">Custom Upload</option>
+            </select>
+          </div>
+          <div id="background-upload-field" class="field hidden">
+            <label for="pdf-background-file">Custom Background</label>
+            <input id="pdf-background-file" type="file" accept=".png,.jpg,.jpeg" />
+            <p id="background-status" class="helper"></p>
+          </div>
+          <button id="save-pamphlet-button" type="button">Save Changes</button>
+          <p id="save-status" class="helper"></p>
+        </div>
+        <textarea id="one-pager-text" rows="18">{{ one_pager or "" }}</textarea>
+        <div id="download-actions" class="actions hidden">
+          <a id="download-pdf-link" class="download-link" href="#" download>Download PDF</a>
+          <a id="download-docx-link" class="download-link" href="#" download>Download DOCX</a>
+          <p class="helper">Your saved text is used for both PDF and DOCX downloads. Line spacing, font size, and background settings affect the PDF export only.</p>
+        </div>
+      </div>
+
+      <div id="transcript-panel" class="panel{% if not transcript %} hidden{% endif %}">
+        <h2>Transcript</h2>
+        <p>This stays raw-first. If Hebrew is unclear, the app pauses and asks for clarification before writing the pamphlet.</p>
+        <pre id="transcript-output">{{ transcript or "" }}</pre>
+      </div>
+    </section>
+  </main>
+  <script>
+    const form = document.getElementById("upload-form");
+    const audioInput = document.getElementById("audio-input");
+    const transcriptInput = document.getElementById("transcript-text");
+    const pamphletInput = document.getElementById("pamphlet-input");
+    const rabbiNameInput = document.getElementById("rabbi-name");
+    const topicInput = document.getElementById("topic");
+    const submitButton = document.getElementById("submit-button");
+    const statusCard = document.getElementById("status-card");
+    const statusLine = document.getElementById("status-line");
+    const statusMeta = document.getElementById("status-meta");
+    const progressBar = document.getElementById("progress-bar");
+    const checklistCard = document.getElementById("checklist-card");
+    const reviewCard = document.getElementById("review-card");
+    const reviewForm = document.getElementById("review-form");
+    const reviewItems = document.getElementById("review-items");
+    const reviewSubmit = document.getElementById("review-submit");
+    const onePagerPanel = document.getElementById("one-pager-panel");
+    const transcriptPanel = document.getElementById("transcript-panel");
+    const onePagerText = document.getElementById("one-pager-text");
+    const pamphletTitleInput = document.getElementById("pamphlet-title");
+    const transcriptOutput = document.getElementById("transcript-output");
+    const downloadActions = document.getElementById("download-actions");
+    const downloadPdfLink = document.getElementById("download-pdf-link");
+    const downloadDocxLink = document.getElementById("download-docx-link");
+    const pdfLineSpacingSelect = document.getElementById("pdf-line-spacing");
+    const pdfFontSizeSelect = document.getElementById("pdf-font-size");
+    const pdfBackgroundModeSelect = document.getElementById("pdf-background-mode");
+    const pdfBackgroundFileInput = document.getElementById("pdf-background-file");
+    const backgroundUploadField = document.getElementById("background-upload-field");
+    const backgroundStatus = document.getElementById("background-status");
+    const savePamphletButton = document.getElementById("save-pamphlet-button");
+    const saveStatus = document.getElementById("save-status");
+    const errorBox = document.getElementById("error-box");
+    let activeJobId = null;
+    let pamphletDirty = false;
+    let hasCustomBackground = false;
+
+    function setProgress(progress, message) {
+      statusCard.classList.remove("hidden");
+      progressBar.style.width = `${progress}%`;
+      statusLine.textContent = message;
+      statusMeta.textContent = `${progress}%`;
+    }
+
+    function showError(message) {
+      errorBox.textContent = message;
+      errorBox.classList.remove("hidden");
+    }
+
+    function clearError() {
+      errorBox.textContent = "";
+      errorBox.classList.add("hidden");
+    }
+
+    function setSaveStatus(message) {
+      saveStatus.textContent = message || "";
+    }
+
+    function setBackgroundStatus(message) {
+      backgroundStatus.textContent = message || "";
+    }
+
+    function updateBackgroundUploadVisibility() {
+      const showCustom = pdfBackgroundModeSelect.value === "custom";
+      backgroundUploadField.classList.toggle("hidden", !showCustom);
+      if (!showCustom) {
+        setBackgroundStatus("");
+      } else if (hasCustomBackground && !pdfBackgroundFileInput.files.length) {
+        setBackgroundStatus("Using your most recently uploaded custom background.");
+      }
+    }
+
+    async function uploadCustomBackgroundIfNeeded() {
+      if (pdfBackgroundModeSelect.value !== "custom") {
+        return;
+      }
+      if (!activeJobId) {
+        throw new Error("No active pamphlet job was found.");
+      }
+      if (!pdfBackgroundFileInput.files.length) {
+        if (hasCustomBackground) {
+          return;
+        }
+        throw new Error("Choose a custom background image before saving or downloading.");
+      }
+
+      setBackgroundStatus("Uploading custom background...");
+      const formData = new FormData();
+      formData.append("background", pdfBackgroundFileInput.files[0]);
+      const response = await fetch(`/pamphlet/${activeJobId}/background`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Could not upload the custom background.");
+      }
+
+      hasCustomBackground = true;
+      pdfBackgroundFileInput.value = "";
+      setBackgroundStatus("Custom background uploaded.");
+    }
+
+    async function savePamphletEdits() {
+      if (!activeJobId) {
+        throw new Error("No active pamphlet job was found.");
+      }
+
+      const editedText = onePagerText.value.trim();
+      const editedTitle = pamphletTitleInput.value.trim();
+      if (!editedText) {
+        throw new Error("Pamphlet text cannot be empty.");
+      }
+      if (!editedTitle) {
+        throw new Error("Pamphlet title cannot be empty.");
+      }
+
+      await uploadCustomBackgroundIfNeeded();
+
+      const response = await fetch(`/pamphlet/${activeJobId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          topic: editedTitle,
+          edited_one_pager: editedText,
+          pdf_line_spacing: pdfLineSpacingSelect.value,
+          pdf_font_size: pdfFontSizeSelect.value,
+          pdf_background_mode: pdfBackgroundModeSelect.value,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Could not save pamphlet changes.");
+      }
+
+      pamphletDirty = false;
+      setSaveStatus("Changes saved.");
+    }
+
+    async function downloadWithFeedback(url, fallbackName) {
+      clearError();
+      if (pamphletDirty) {
+        setSaveStatus("Saving changes...");
+        await savePamphletEdits();
+      }
+      const response = await fetch(url);
+      if (!response.ok) {
+        let message = "Download failed.";
+        const contentType = response.headers.get("content-type") || "";
+        if (contentType.includes("application/json")) {
+          const data = await response.json();
+          message = data.error || message;
+        } else {
+          const text = await response.text();
+          if (text) {
+            message = text;
+          }
+        }
+        throw new Error(message);
+      }
+
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = objectUrl;
+      const disposition = response.headers.get("content-disposition") || "";
+      const filenameStarMatch = disposition.match(/filename\*=UTF-8''([^;]+)/i);
+      const filenameMatch = disposition.match(/filename=\"?([^\";]+)\"?/i);
+      const suggestedName = filenameStarMatch
+        ? decodeURIComponent(filenameStarMatch[1])
+        : (filenameMatch ? filenameMatch[1] : fallbackName);
+      anchor.download = suggestedName || fallbackName;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(objectUrl);
+    }
+
+    function updateSubmitState() {
+      const hasSource = audioInput.files.length || transcriptInput.value.trim() || pamphletInput.value.trim();
+      const ready = hasSource && rabbiNameInput.value.trim() && topicInput.value.trim();
+      submitButton.disabled = !ready;
+      checklistCard.classList.toggle("hidden", !hasSource);
+    }
+
+    function renderReviewItems(items) {
+      reviewItems.innerHTML = "";
+      items.forEach((item) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "review-item";
+
+        const suggestions = item.suggestions && item.suggestions.length
+          ? `Suggested glossary matches: ${item.suggestions.join("; ")}`
+          : "No glossary suggestion matched cleanly here.";
+
+        wrapper.innerHTML = `
+          <div class="badge">Segment ${item.segment_index} | ${item.timestamp}</div>
+          <p><strong>Transcript line:</strong> ${item.raw_text}</p>
+          <p class="context"><strong>Context:</strong> ${item.context}</p>
+          <p class="suggestions">${suggestions}</p>
+          <div class="field">
+            <label for="${item.id}">Clarification</label>
+            <input id="${item.id}" name="${item.id}" type="text" value="${item.clarification || ""}" placeholder="Enter the Hebrew term in transliteration + English" />
+          </div>
+        `;
+        reviewItems.appendChild(wrapper);
+      });
+    }
+
+    async function pollStatus(jobId) {
+      activeJobId = jobId;
+      while (true) {
+        const response = await fetch(`/status/${jobId}`);
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Status check failed.");
+        }
+
+        setProgress(data.progress || 0, data.message || "Working...");
+        transcriptOutput.textContent = data.final_transcript || data.raw_transcript || "";
+        if (transcriptOutput.textContent) {
+          transcriptPanel.classList.remove("hidden");
+        }
+
+        if (data.status === "completed") {
+          reviewCard.classList.add("hidden");
+          pamphletTitleInput.value = data.topic || "";
+          onePagerText.value = data.edited_one_pager || data.one_pager || "";
+          pdfLineSpacingSelect.value = String(data.pdf_line_spacing || 1.0);
+          pdfFontSizeSelect.value = String(data.pdf_font_size || 0);
+          pdfBackgroundModeSelect.value = data.pdf_background_mode || "default";
+          hasCustomBackground = Boolean(data.pdf_custom_background);
+          updateBackgroundUploadVisibility();
+          pamphletDirty = false;
+          setSaveStatus("");
+          onePagerPanel.classList.remove("hidden");
+          downloadPdfLink.href = `/download/${jobId}.pdf`;
+          downloadDocxLink.href = `/download/${jobId}.docx`;
+          downloadActions.classList.remove("hidden");
+          updateSubmitState();
+          submitButton.textContent = "Create Pamphlet";
+          return;
+        }
+
+        if (data.status === "needs_review") {
+          renderReviewItems(data.review_items || []);
+          reviewCard.classList.remove("hidden");
+          submitButton.disabled = true;
+          submitButton.textContent = "Waiting for Review";
+          return;
+        }
+
+        if (data.status === "failed") {
+          reviewCard.classList.add("hidden");
+          updateSubmitState();
+          submitButton.textContent = "Create Pamphlet";
+          showError(data.error || "Processing failed.");
+          return;
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      }
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      clearError();
+
+      if (!audioInput.files.length && !transcriptInput.value.trim() && !pamphletInput.value.trim()) {
+        showError("Please choose an .mp3 or .mp4 file, paste a transcript, or paste a finished pamphlet.");
+        return;
+      }
+      if (!rabbiNameInput.value.trim()) {
+        showError("Please enter the Rabbi's name.");
+        return;
+      }
+      if (!topicInput.value.trim()) {
+        showError("Please enter the topic for this pamphlet.");
+        return;
+      }
+
+      submitButton.disabled = true;
+      submitButton.textContent = "Processing...";
+      activeJobId = null;
+      onePagerPanel.classList.add("hidden");
+      downloadActions.classList.add("hidden");
+      transcriptPanel.classList.add("hidden");
+      reviewCard.classList.add("hidden");
+      hasCustomBackground = false;
+      updateBackgroundUploadVisibility();
+      setProgress(
+        5,
+        pamphletInput.value.trim()
+          ? "Submitting pamphlet..."
+          : transcriptInput.value.trim()
+            ? "Submitting transcript..."
+            : "Uploading audio..."
+      );
+
+      const formData = new FormData(form);
+      const response = await fetch("/process", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        updateSubmitState();
+        submitButton.textContent = "Create Pamphlet";
+        showError(data.error || "Upload failed.");
+        return;
+      }
+
+      setProgress(
+        10,
+        pamphletInput.value.trim()
+          ? "Pamphlet received. Opening editor..."
+          : transcriptInput.value.trim()
+            ? "Transcript received. Starting review..."
+            : "Upload complete. Starting transcription..."
+      );
+      pollStatus(data.job_id).catch((error) => {
+        updateSubmitState();
+        submitButton.textContent = "Create Pamphlet";
+        showError(error.message);
+      });
+    });
+
+    reviewForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      clearError();
+
+      if (!activeJobId) {
+        showError("No active review job was found.");
+        return;
+      }
+
+      const answers = {};
+      const inputs = reviewForm.querySelectorAll("input[type='text']");
+      for (const input of inputs) {
+        if (!input.value.trim()) {
+          showError("Please clarify every flagged Hebrew segment before continuing.");
+          return;
+        }
+        answers[input.name] = input.value.trim();
+      }
+
+      reviewSubmit.disabled = true;
+      reviewSubmit.textContent = "Saving...";
+
+      const response = await fetch(`/review/${activeJobId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answers }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        reviewSubmit.disabled = false;
+        reviewSubmit.textContent = "Continue to Pamphlet";
+        showError(data.error || "Review submission failed.");
+        return;
+      }
+
+      reviewCard.classList.add("hidden");
+      reviewSubmit.disabled = false;
+      reviewSubmit.textContent = "Continue to Pamphlet";
+      submitButton.disabled = true;
+      setProgress(78, "Clarifications saved. Writing the Rabbi-voice pamphlet...");
+      pollStatus(activeJobId).catch((error) => {
+        updateSubmitState();
+        submitButton.textContent = "Create Pamphlet";
+        showError(error.message);
+      });
+    });
+
+    audioInput.addEventListener("change", updateSubmitState);
+    transcriptInput.addEventListener("input", updateSubmitState);
+    pamphletInput.addEventListener("input", updateSubmitState);
+    rabbiNameInput.addEventListener("input", updateSubmitState);
+    topicInput.addEventListener("input", updateSubmitState);
+    onePagerText.addEventListener("input", () => {
+      if (!onePagerPanel.classList.contains("hidden")) {
+        pamphletDirty = true;
+        setSaveStatus("Unsaved changes.");
+      }
+    });
+    pamphletTitleInput.addEventListener("input", () => {
+      if (!onePagerPanel.classList.contains("hidden")) {
+        pamphletDirty = true;
+        setSaveStatus("Unsaved changes.");
+      }
+    });
+    pdfLineSpacingSelect.addEventListener("change", () => {
+      if (!onePagerPanel.classList.contains("hidden")) {
+        pamphletDirty = true;
+        setSaveStatus("Unsaved changes.");
+      }
+    });
+    pdfFontSizeSelect.addEventListener("change", () => {
+      if (!onePagerPanel.classList.contains("hidden")) {
+        pamphletDirty = true;
+        setSaveStatus("Unsaved changes.");
+      }
+    });
+    pdfBackgroundModeSelect.addEventListener("change", () => {
+      updateBackgroundUploadVisibility();
+      if (!onePagerPanel.classList.contains("hidden")) {
+        pamphletDirty = true;
+        setSaveStatus("Unsaved changes.");
+      }
+    });
+    pdfBackgroundFileInput.addEventListener("change", () => {
+      if (!onePagerPanel.classList.contains("hidden")) {
+        pamphletDirty = true;
+        setSaveStatus("Unsaved changes.");
+        setBackgroundStatus(pdfBackgroundFileInput.files.length ? "A new custom background is ready to upload." : "");
+      }
+    });
+    savePamphletButton.addEventListener("click", async () => {
+      clearError();
+      setSaveStatus("Saving changes...");
+      try {
+        await savePamphletEdits();
+      } catch (error) {
+        setSaveStatus("");
+        showError(error.message);
+      }
+    });
+
+    downloadPdfLink.addEventListener("click", async (event) => {
+      event.preventDefault();
+      try {
+        await downloadWithFeedback(downloadPdfLink.href, "pamphlet.pdf");
+      } catch (error) {
+        showError(error.message);
+      }
+    });
+
+    downloadDocxLink.addEventListener("click", async (event) => {
+      event.preventDefault();
+      try {
+        await downloadWithFeedback(downloadDocxLink.href, "pamphlet.docx");
+      } catch (error) {
+        showError(error.message);
+      }
+    });
+    updateBackgroundUploadVisibility();
+    updateSubmitState();
+  </script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+services:
+  - type: web
+    name: torah-center-web
+    runtime: python
+    rootDir: cloud_backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: python serve_waitress.py
+    plan: starter
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        fromService:
+          type: web
+          name: torah-center-web
+          property: port
+      - key: APP_DEBUG
+        value: "0"
+      - key: SESSION_COOKIE_SECURE
+        value: "1"
+      - key: WEB_BASE_URL
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: CLERK_PUBLISHABLE_KEY
+        sync: false
+      - key: CLERK_SECRET_KEY
+        sync: false
+      - key: CLERK_FRONTEND_API_URL
+        sync: false
+      - key: CLERK_JWKS_URL
+        sync: false
+      - key: CLERK_AFTER_SIGN_IN_URL
+        sync: false
+      - key: CLERK_AFTER_SIGN_UP_URL
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: MOBILE_APP_SECRET
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: torah-center-db
+          property: connectionString
+      - key: WORKER_MODE
+        value: queued
+      - key: STORAGE_BACKEND
+        value: s3
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_REGION
+        sync: false
+      - key: S3_ENDPOINT_URL
+        sync: false
+      - key: S3_PREFIX
+        value: torah-center
+
+  - type: worker
+    name: torah-center-worker
+    runtime: python
+    rootDir: cloud_backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: python worker.py
+    plan: starter
+    envVars:
+      - key: APP_DEBUG
+        value: "0"
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: CLERK_SECRET_KEY
+        sync: false
+      - key: CLERK_JWKS_URL
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: MOBILE_APP_SECRET
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: torah-center-db
+          property: connectionString
+      - key: WORKER_MODE
+        value: queued
+      - key: STORAGE_BACKEND
+        value: s3
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_REGION
+        sync: false
+      - key: S3_ENDPOINT_URL
+        sync: false
+      - key: S3_PREFIX
+        value: torah-center
+
+databases:
+  - name: torah-center-db
+    plan: starter

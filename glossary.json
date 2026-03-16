@@ -1,0 +1,254 @@
+{
+  "entries": [
+    {
+      "canonical": "parashat-ki-tisa",
+      "display": "Parashat Ki Tisa",
+      "variants": ["ki tisa", "parashat ki tisa", "parashah ki tisa"]
+    },
+    {
+      "canonical": "machatzit-hashekel",
+      "display": "machatzit hashekel (half-shekel)",
+      "variants": ["mahatsita shekeil", "mahatsita shekel", "machatzit hashekel", "machatzit shekel"]
+    },
+    {
+      "canonical": "mishkan",
+      "display": "Mishkan (Tabernacle)",
+      "variants": ["mishkan"]
+    },
+    {
+      "canonical": "chet-haegel",
+      "display": "chet ha'egel (sin of the Golden Calf)",
+      "variants": ["hehta egeil", "chet haegel", "het haegel", "golden calf"]
+    },
+    {
+      "canonical": "moshe-rabbenu",
+      "display": "Moshe Rabbenu (Moses our teacher)",
+      "variants": ["mosharaben", "mosharabeinu", "moshe rabbenu", "moshe rabbeinu"]
+    },
+    {
+      "canonical": "luchot-habrit",
+      "display": "luchot ha'berit (tablets of the covenant)",
+      "variants": ["luhotabere", "luchot habrit", "luchot ha berit", "tablets"]
+    },
+    {
+      "canonical": "yud-gimel-midot",
+      "display": "Yud-Gimmel Middot (Thirteen Attributes of Mercy)",
+      "variants": ["yurgimomidot", "yud gimel middot", "yudgimmel middot", "13 attributes of mercy"]
+    },
+    {
+      "canonical": "am-yisrael",
+      "display": "Am Yisrael (the Jewish people)",
+      "variants": ["amistra el", "am yisrael", "amisrael"]
+    },
+    {
+      "canonical": "hakadosh-baruch-hu",
+      "display": "HaKadosh Barukh Hu (the Holy One, blessed be He)",
+      "variants": ["hakkadosh parahou", "hakadosh baruch hu", "hakadosh baruhu"]
+    },
+    {
+      "canonical": "pasuk",
+      "display": "pasuk (verse)",
+      "variants": ["pasuk"]
+    },
+    {
+      "canonical": "vishamru",
+      "display": "vishamru (they shall guard)",
+      "variants": ["visham in", "vishamiru", "vishamru"]
+    },
+    {
+      "canonical": "et-hashabbat",
+      "display": "et haShabbat (the Shabbat)",
+      "variants": ["ehta shabbat", "et hashabbat", "et ha shabbat"]
+    },
+    {
+      "canonical": "laasot-et-hashabbat",
+      "display": "la'asot et haShabbat (to make the Shabbat)",
+      "variants": ["la asot ehta shabbat", "laa sotha shabbat", "la asot et hashabbat", "la asot itah shabbat"]
+    },
+    {
+      "canonical": "ledorotam-berit-olam",
+      "display": "le-dorotam berit olam (an eternal covenant for their generations)",
+      "variants": ["le dorotam berit olam", "ledorotam berit olam"]
+    },
+    {
+      "canonical": "shamor-vezakhor",
+      "display": "shamor ve-zakhor (guard and remember)",
+      "variants": ["shamor vezahor", "shamor vezakhor"]
+    },
+    {
+      "canonical": "gemara",
+      "display": "Gemara",
+      "variants": ["gamara", "gemara"]
+    },
+    {
+      "canonical": "kivia-vekaima",
+      "display": "kevi'a ve-kayma (fixed and enduring)",
+      "variants": ["kiviyah vekaimah", "kevia vekaima", "keviya vekayma"]
+    },
+    {
+      "canonical": "tzeit-hakochavim",
+      "display": "tzeit ha-kochavim (nightfall)",
+      "variants": ["setakohavim", "tzet hakochavim", "tzeit hakochavim"]
+    },
+    {
+      "canonical": "kiddush",
+      "display": "Kiddush",
+      "variants": ["khidush", "kiddush"]
+    },
+    {
+      "canonical": "ibn-ezra",
+      "display": "Ibn Ezra",
+      "variants": ["ibn ezra", "appiab shah"]
+    },
+    {
+      "canonical": "erev-shabbat",
+      "display": "Erev Shabbat (Friday leading into Shabbat)",
+      "variants": ["edev shabbat", "edif shibat", "erev shabbat"]
+    },
+    {
+      "canonical": "issur-melakhah",
+      "display": "issur melakhah (forbidden labor)",
+      "variants": ["isur melaha", "isur me'laqah", "issur melakhah"]
+    },
+    {
+      "canonical": "or-hachayim",
+      "display": "Or HaChayim",
+      "variants": ["orahayim akadosh", "orahayim", "ora haim", "or hachayim"]
+    },
+    {
+      "canonical": "sefer-bereshit",
+      "display": "Sefer Bereshit (Book of Genesis)",
+      "variants": ["seffid bereshit", "sefid benesheet", "sefer bereshit"]
+    },
+    {
+      "canonical": "yaakov-avinu",
+      "display": "Yaakov Avinu (Jacob our forefather)",
+      "variants": ["yaakov avino", "yaakov avinu"]
+    },
+    {
+      "canonical": "yosef",
+      "display": "Yosef (Joseph)",
+      "variants": ["your seff", "yosef"]
+    },
+    {
+      "canonical": "veaviv-shamar-et-hadavar",
+      "display": "ve'aviv shamar et ha-davar (his father kept the matter in mind)",
+      "variants": ["the aviv shammar itadavar", "ve aviv shamar et hadavar", "shammar itadavar"]
+    },
+    {
+      "canonical": "menuchah",
+      "display": "menuchah (rest)",
+      "variants": ["minu ha", "menucha", "menuchah"]
+    },
+    {
+      "canonical": "kedushah",
+      "display": "kedushah (holiness)",
+      "variants": ["cadu shah", "kdushah", "kiddushah", "kedusha", "kedushah"]
+    },
+    {
+      "canonical": "shnayim-mikra",
+      "display": "Shnayim Mikra ve-Echad Targum",
+      "variants": ["shnai mikrabe a haat algum", "shnai mikra", "shnayim mikra ve echad targum"]
+    },
+    {
+      "canonical": "torah-shebeal-peh",
+      "display": "Torah she-be'al peh (the Oral Torah)",
+      "variants": ["torah shabbat", "torah shibal peh", "oral law", "oral torah"]
+    },
+    {
+      "canonical": "pri-tzadik",
+      "display": "Pri Tzadik",
+      "variants": ["visadokha kohimidublin", "pre sadik", "pritzadik", "pri tzadik"]
+    },
+    {
+      "canonical": "tanur-shel-achnai",
+      "display": "Tanur shel Achnai",
+      "variants": ["tanushia lachnae", "oven of ahnae", "tanur shel achnai"]
+    },
+    {
+      "canonical": "bava-metzia",
+      "display": "Bava Metzia",
+      "variants": ["ba ba mitziyah", "bava metzia"]
+    },
+    {
+      "canonical": "lo-bashamayim-hi",
+      "display": "lo ba-shamayim hi (it is not in heaven)",
+      "variants": ["lo ba shamayimhi", "lo bashamayim hi"]
+    },
+    {
+      "canonical": "nitzchuni-banai",
+      "display": "nitzchuni banai (My children have prevailed over Me)",
+      "variants": ["nitzhoni ba nai", "nitzhoni", "nitzchuni banai"]
+    },
+    {
+      "canonical": "matanah-tovah",
+      "display": "matanah tovah (a precious gift)",
+      "variants": ["matana tova", "matanah tovah"]
+    },
+    {
+      "canonical": "beit-genazi",
+      "display": "beit genazi (treasure house)",
+      "variants": ["bebeth genazi", "beit genazi"]
+    },
+    {
+      "canonical": "hacham-ovadia",
+      "display": "Hacham Ovadia",
+      "variants": ["hahama vaidya", "hacham ovadia"]
+    },
+    {
+      "canonical": "minhah",
+      "display": "Minhah (afternoon prayer)",
+      "variants": ["premen hah", "minhah", "mincha"]
+    },
+    {
+      "canonical": "neviim-u-ketuvim",
+      "display": "Nevi'im u-Ketuvim (Prophets and Writings)",
+      "variants": ["nivimokitubim", "nivim", "neviim u ketuvim"]
+    },
+    {
+      "canonical": "halakhah",
+      "display": "halakhah (Jewish law)",
+      "variants": ["hahaha", "halahas", "halahik", "halakhah"]
+    },
+    {
+      "canonical": "kedushat-levi",
+      "display": "Kedushat Levi",
+      "variants": ["kiddushat levi", "kedushat levi"]
+    },
+    {
+      "canonical": "miyad-nigalim",
+      "display": "miyad nig'alim (they would be redeemed immediately)",
+      "variants": ["miyad nigalim", "miyad nigalim"]
+    },
+    {
+      "canonical": "shefa",
+      "display": "shefa (divine flow of blessing)",
+      "variants": ["shefa"]
+    },
+    {
+      "canonical": "mitzvah-goreret-mitzvah",
+      "display": "mitzvah goreret mitzvah (one mitzvah leads to another)",
+      "variants": ["mitzvah go in it mitzvah", "mitzvah goreret mitzvah"]
+    },
+    {
+      "canonical": "lev-tahor",
+      "display": "lev tahor (pure heart)",
+      "variants": ["left haim", "lev tahor"]
+    },
+    {
+      "canonical": "divrei-torah",
+      "display": "divrei Torah (words of Torah)",
+      "variants": ["divrei torah", "speaking divrei torah", "dvar torah"]
+    },
+    {
+      "canonical": "olam-haba",
+      "display": "olam haba (the World to Come)",
+      "variants": ["olam haba", "olam haba"]
+    },
+    {
+      "canonical": "shabbat-shalom",
+      "display": "Shabbat Shalom",
+      "variants": ["shibat shalom", "shabbat shalom"]
+    }
+  ]
+}

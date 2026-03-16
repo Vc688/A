@@ -1,0 +1,928 @@
+{
+  "entries": [
+    {
+      "raw_text": "Yud Gimum Midot Avrahamim",
+      "replacement": "Yud-Gimmel Middot (Thirteen Attributes of Mercy)",
+      "example_context": "Moshe Rabbeinu intercedes. He says the Yud Gimum Midot Avrahamim and Hashem eventually renews his connection to Am Yisrael.",
+      "updated_at": "2026-03-13T03:10:57.478158Z"
+    },
+    {
+      "raw_text": "Tzedek HaKochavim",
+      "replacement": "tzeit ha-kochavim (nightfall)",
+      "example_context": "It's a constant, it's something that hits right at sunset and it ends at Tzedek HaKochavim.",
+      "updated_at": "2026-03-13T03:10:57.478158Z"
+    },
+    {
+      "raw_text": "hachamim and the Sanhedrin, to use Torah Shabbat Alpeh",
+      "replacement": "Torah she-be'al peh (the Oral Torah)",
+      "example_context": "He was, throughout all of his writings, somebody who was a very big believer in the power and the uniqueness of Torah Shabbat Alpeh.",
+      "updated_at": "2026-03-13T03:10:57.478158Z"
+    },
+    {
+      "raw_text": "Shabbat toameha hayim zachu",
+      "replacement": "Shabbat toameha hayim zachu",
+      "example_context": "The Shabbat toameha hayim zachu, people who taste the beauty of Shabbat, the zocheh, to have real life.",
+      "updated_at": "2026-03-13T03:10:57.478158Z"
+    },
+    {
+      "raw_text": "Ora Chaim",
+      "replacement": "Orach Chaim HaKadosh (Rabbi Ovadia of Bartenura)",
+      "example_context": "We went over the Ora Chaim. The Ora Chaim told us that it's much more about waiting in anticipation of the Shabbat...",
+      "updated_at": "2026-03-13T03:10:57.478158Z"
+    },
+    {
+      "raw_text": "la'asot et ha-shabbat",
+      "replacement": "la'asot et haShabbat - 'to make/do the Shabbat'",
+      "example_context": "But when it comes to the idea of la'asot et ha-shabbat, to make the Shabbat, to create the Shabbat? Shabbat is, as the Gemara says, kevi'ah ve-kaima.",
+      "updated_at": "2026-03-13T03:54:14.799992Z"
+    },
+    {
+      "raw_text": "Yud Gimel Midot of Rahamim",
+      "replacement": "Yud-Gimmel Middot (Thirteen Attributes of Mercy)",
+      "example_context": "He says the Yud Gimel Midot of Rahamim, and Hashem eventually renews His connection to Am Yisrael.",
+      "updated_at": "2026-03-13T03:54:14.799992Z"
+    },
+    {
+      "raw_text": "pshat that the Ibn Ezra brings down",
+      "replacement": "pshat (simple explanation) that the Ibn Ezra offers",
+      "example_context": "That's the pshat that the Ibn Ezra brings down. The Or HaChayim HaKadosh brings down another perush to this and he says that we see this word shamar elsewhere.",
+      "updated_at": "2026-03-13T03:54:14.799992Z"
+    },
+    {
+      "raw_text": "Ribi Sadoka Kohen Milublin",
+      "replacement": "Rabbi Tzadok HaKohen of Lublin",
+      "example_context": "A third approach that we have is the approach of Ribi Sadoka Kohen Milublin. Ribi Sadoka Kohen Milublin lived about 125 years ago.",
+      "updated_at": "2026-03-13T03:54:14.799992Z"
+    },
+    {
+      "raw_text": "going on my Friday night table",
+      "replacement": "being at my Friday night table",
+      "example_context": "What we're saying over here is, how do you feel God? How are you going to keep Shabbat? By keeping Shabbat the right way one time, the accomplishment you'll feel from doing things right, from going on my Friday night table, not running to the game right afterwards to watch, to see the score, and not my Shabbat being how quickly can I finish the meal, and not speaking Lashon Hara, God forbid, at the table, or politics, or this.",
+      "updated_at": "2026-03-13T03:54:14.799992Z"
+    },
+    {
+      "raw_text": "La'asotet haShabbat, v'shamu lubnei set haShabbat",
+      "replacement": "v'shamru b'nei Yisrael et haShabbat - 'and Benei Yisrael guarded the Shabbat'",
+      "example_context": "The Shabbat toameha hayim zachu, people who taste the beauty of Shabbat, the zocheh, to have real life. And that's what we're saying over here. La'asotet haShabbat, v'shamu lubnei set haShabbat. When we keep and guard the Shabbat the right way...",
+      "updated_at": "2026-03-13T03:54:14.799992Z"
+    },
+    {
+      "raw_text": "Orach Chaim HaKadosh (Rabbi Ovadia of Bartenura)",
+      "replacement": "Or HaChaim HaKadosh",
+      "example_context": "We went over the Orach Chaim HaKadosh (Rabbi Ovadia of Bartenura). The Orach Chaim HaKadosh (Rabbi Ovadia of Bartenura) told us that it's much more about waiting in anticipation of the Shabbat...",
+      "updated_at": "2026-03-13T03:54:14.799992Z"
+    },
+    {
+      "raw_text": "Yudgim Momidot Avrachamim",
+      "replacement": "Yud-Gimmel Middot Avrachamim (Thirteen Attributes of Mercy)",
+      "example_context": "He says the Yudgim Momidot Avrachamim, and Hashem eventually renews his connection to Am Yisrael.",
+      "updated_at": "2026-03-13T04:01:43.831481Z"
+    },
+    {
+      "raw_text": "Orachayim HaKadosh",
+      "replacement": "Or HaChayim HaKadosh",
+      "example_context": "The Orachayim HaKadosh brings down another perush to this and he says that we see this word shamar elsewhere.",
+      "updated_at": "2026-03-13T04:01:43.831481Z"
+    },
+    {
+      "raw_text": "mamtin u'msapeh matayavo",
+      "replacement": "mamten u'mesapeh matayavo (he was holding back and anticipating its arrival)",
+      "example_context": "he was mamtin u'msapeh matayavo. It didn't just mean he noted it in his head, but he was waiting with anticipation",
+      "updated_at": "2026-03-13T04:01:43.831481Z"
+    },
+    {
+      "raw_text": "shnai mikra ve'ahad targum",
+      "replacement": "Shnayim Mikra Ve-echad Targum (reading the weekly Torah portion twice and the translation once)",
+      "example_context": "Am I reviewing the parasha correctly? Am I doing shnai mikra ve'ahad targum? Am I spending time talking over Torah with my family?",
+      "updated_at": "2026-03-13T04:01:43.831481Z"
+    },
+    {
+      "raw_text": "Rabbi Sadoka Kohen Milublin",
+      "replacement": "Rabbi Zadok HaKohen of Lublin",
+      "example_context": "A third approach that we have is the approach of Rabbi Sadoka Kohen Milublin. Rabbi Sadoka Kohen Milublin lived about 125 years ago.",
+      "updated_at": "2026-03-13T04:01:43.831481Z"
+    },
+    {
+      "raw_text": "Torah Sheba Alpeh",
+      "replacement": "Torah Shebe'al Peh (Oral Torah)",
+      "example_context": "He was a very big believer in the power and the uniqueness of Torah Sheba Alpeh.",
+      "updated_at": "2026-03-13T04:01:43.831481Z"
+    },
+    {
+      "raw_text": "Mashiach, we're going to see the Geula, the redemption.",
+      "replacement": "Geula",
+      "example_context": "Talmud says, if the Jewish people keep one Shabbat the right way, we're going to see the Mashiach, we're going to see the Geula, the redemption.",
+      "updated_at": "2026-03-13T04:01:43.831481Z"
+    },
+    {
+      "raw_text": "and that's how he explains the Pasuk.",
+      "replacement": "and that's how he explains the Pasuk.",
+      "example_context": "Repeated many times in a row, causing awkwardness and likely transcript error.",
+      "updated_at": "2026-03-13T04:01:43.831481Z"
+    },
+    {
+      "raw_text": "Vesham Meru B'nai Yisrael et ha'Shabbat",
+      "replacement": "Veshamru - 'and they shall guard'",
+      "example_context": "But in this week's parasha we have the famous pasuk where we say, Vesham Meru B'nai Yisrael et ha'Shabbat. The Jewish people watched over, they guarded the Shabbat, la'asot et ha'Shabbat le'dorotam berit olam, to make Shabbat a berit, a covenant between the Jewish people and Hashem eternally.",
+      "updated_at": "2026-03-13T04:13:48.271961Z"
+    },
+    {
+      "raw_text": "tzedek ha'chavim",
+      "replacement": "tzeit ha-kochavim - nightfall",
+      "example_context": "Shabbat is, as the Gemara says, kevi'ah ve'kaima, it is. It's a constant, it's something that hits right at sunset and ends at tzedek ha'chavim. It's a certain metziut, a certain reality that we live in when we get to Shabbat.",
+      "updated_at": "2026-03-13T04:13:48.271961Z"
+    },
+    {
+      "raw_text": "al piyapshat",
+      "replacement": "al peshat - according to the simple/plain meaning",
+      "example_context": "The Ibn Ezra talks about al piyapshat, this idea of what it means to la'asot et ha'Shabbat, to make the Shabbat.",
+      "updated_at": "2026-03-13T04:13:48.271961Z"
+    },
+    {
+      "raw_text": "\u05e9\u05d9\u05ea\u05d4\u05db\u05df \u05e1\u05dc\u05db\u05d9\u05d5 \u05d5\u05d3\u05e8\u05db\u05d9\u05d5 \u05d1\u05d9\u05d5\u05dd \u05d4\u05e9\u05d9\u05e9\u05d9 \u05db\u05d3\u05d9 \u05e9\u05d9\u05e9\u05de\u05d5\u05e8 \u05d4\u05e9\u05d1\u05ea \u05d5\u05dc\u05d0 \u05d9\u05d7\u05dc\u05dc\u05e0\u05d4",
+      "replacement": "\u05e9\u05d9\u05ea\u05d4\u05db\u05df \u05e1\u05dc\u05db\u05d9\u05d5 \u05d5\u05d3\u05e8\u05db\u05d9\u05d5 \u05d1\u05d9\u05d5\u05dd \u05d4\u05e9\u05d9\u05e9\u05d9 \u05db\u05d3\u05d9 \u05e9\u05d9\u05e9\u05de\u05d5\u05e8 \u05d4\u05e9\u05d1\u05ea \u05d5\u05dc\u05d0 \u05d9\u05d7\u05dc\u05dc\u05e0\u05d4",
+      "example_context": "That Ibn Ezra says, \u05e9\u05d9\u05ea\u05d4\u05db\u05df \u05e1\u05dc\u05db\u05d9\u05d5 \u05d5\u05d3\u05e8\u05db\u05d9\u05d5 \u05d1\u05d9\u05d5\u05dd \u05d4\u05e9\u05d9\u05e9\u05d9 \u05db\u05d3\u05d9 \u05e9\u05d9\u05e9\u05de\u05d5\u05e8 \u05d4\u05e9\u05d1\u05ea \u05d5\u05dc\u05d0 \u05d9\u05d7\u05dc\u05dc\u05e0\u05d4. Says the Ibn Ezra that we have a obligation of la'asot et ha'Shabbat that kicks in on the weekday, on Friday.",
+      "updated_at": "2026-03-13T04:13:48.271961Z"
+    },
+    {
+      "raw_text": "mamtin umtsapeh matayavo",
+      "replacement": "mamtin - waiting",
+      "example_context": "He was mamtin umtsapeh matayavo. It didn't just mean he noted it in his head, but he was waiting with anticipation, when is this going to happen?",
+      "updated_at": "2026-03-13T04:13:48.271961Z"
+    },
+    {
+      "raw_text": "Mizbeach",
+      "replacement": "Mizbeach - altar",
+      "example_context": "but having, and not speaking Lashon Hara, God forbid at the table, or politics or this, taking the Shabbat table and making it holy, making it a Mizbeach, talking Torah, giving over a Devar Torah at the table.",
+      "updated_at": "2026-03-13T04:13:48.271961Z"
+    },
+    {
+      "raw_text": "B'tzadokah",
+      "replacement": "B'tzadok - Rabbi Tzadok HaKohen of Lublin",
+      "example_context": "Then we went over the B'tzadokah, the B'tzadokah who is a person who is talking about the uniqueness of Torah Shebe'al Peh (Oral Torah), he says Shabbat has holiness but we have the ability to add more holiness to Shabbat when we do it the right way,",
+      "updated_at": "2026-03-13T04:13:48.271961Z"
+    },
+    {
+      "raw_text": "Sheikh taken serachav udrachav bayom ha'shishi",
+      "replacement": "She'khet taken srachav u'drachav b'yom ha'shishi - 'One should prepare broadly and extensively on the sixth day (Friday)'",
+      "example_context": "The Ibn Ezra says, Sheikh taken serachav udrachav bayom ha'shishi, kedeshi yishmor ha'Shabbat ve'lo yichalelena.",
+      "updated_at": "2026-03-13T04:28:43.326337Z"
+    },
+    {
+      "raw_text": "Yud Gimel Middot Avrahamim",
+      "replacement": "Yud-Gimmel Middot - Thirteen Attributes of Mercy",
+      "example_context": "He says the Yud Gimel Middot Avrahamim, and Hashem eventually renews his connection to Am Yisrael.",
+      "updated_at": "2026-03-13T04:28:43.326337Z"
+    },
+    {
+      "raw_text": "Hashem is angry at Bnei Yisrael, so eventually Moshe Rabbeinu intercedes. He says the Yud Gimel Middot Avrahamim",
+      "replacement": "He recites the Yud-Gimmel Middot (Thirteen Attributes of Mercy)",
+      "example_context": "Hashem is angry at Bnei Yisrael, so eventually Moshe Rabbeinu intercedes. He says the Yud Gimel Middot Avrahamim, and Hashem eventually renews his connection to Am Yisrael.",
+      "updated_at": "2026-03-13T04:28:43.326337Z"
+    },
+    {
+      "raw_text": "tzeit ha-kochavim",
+      "replacement": "tzeit ha-kochavim - nightfall (appearance of stars)",
+      "example_context": "Shabbat is there and we're noting its arrival. Right? The Shabbat Malchuta is arriving and we're acknowledging its presence. We're not doing anything in order to bring the Shabbat in really. So the rabbis all wonder what's going on over here. We have a few different approaches to deal with this question. The Ibn Ezra talks about Al-Piyapshat. This idea of what it means to La'asot et HaShabbat. To make the Shabbat. The Ibn Ezra says, Sheikh taken serachav udrachav bayom ha'shishi, kedeshi yishmor ha'Shabbat ve'lo yichalelena. It says in the Ibn Ezra that we have an obligation of La'asot et HaShabbat that kicks in on the weekday, on Friday. That a person has to do everything he can in order to prepare for Shabbat correctly. And when he does some of that work, when he invests a little bit into the weekday, into his Erev Shabbat, when he turns Friday not into a mundane day, but Shabbat is Erev Shabbat. It's a spiritual entity in itself in order to prepare you for the Shabbat itself. When you put the work in over there, you'll be able to create the best Shabbat experience for yourself. If a person just arrives at Shabbat, if he doesn't do anything during the weekday, especially on Friday, to put himself both physically in terms of food, in terms of what he has to prepare, because he can't do any work on Shabbat, but also spiritually to turn his Friday afternoon into something holy, turn his Friday afternoon into a time of a little bit of anticipation for the Shabbat. When you do that to yourself, if you go take a hot shower on Erev Shabbat and you have in mind, I'm doing this for Shabbat, I'm doing this in order to prepare for the arrival of the Shabbat queen, a person puts himself in that right frame of mind and also physically he does all of his actions. I'm cooking the roast on Friday afternoon, that's la'asot et ha'Shabbat, I'm doing actions that'll help me deal with v'shameru later on. The la'asot that I do on Friday afternoon will help me avoid doing any yisur melechah, any prohibition when Shabbat eventually arrives. That's the pshat (simple explanation) that the Ibn Ezra offers. The Orachaim HaKadosh brings down another perush to this and he says that we see this word shamar elsewhere. We go to Sefer Bereshit, back to Yaakov Avinu, where Yosef had all these dreams and Yosef had these different ideas of what was going to be and the pasuk says ve'aviv shamar et ha'davar. His father, Yaakov Avinu, after watching the interactions between Yosef and his brothers, he noted what was going on and says the Orachaim over here that he was mamtin - waiting. It didn't just mean he noted it in his head, but he was waiting with anticipation when is this going to happen. He was on guard and he was very aware of the situation and anticipating its arrival so he would deal with it properly between the interaction between the brothers and Yosef. Ve'aviv shamar et ha'davar. Yaakov Avinu noted what happened but he was anticipating the next steps in order to deal with it properly. And that's what the Orachaim says over here that when we wait with Shabbat we have different ways to relate to Shabbat. On a very simple level and we all enjoy it very much, Shabbat could be a time of relaxation. We have a very busy week. We're tired, especially in a time where we're stimulated with technology all day and we don't have a moment to just kick back and relax and to just disconnect from everything going on around us. Whether it's work, whether it's helping in different institutions, whatever we're doing, Shabbat is a time that we have to just disconnect and relax. It's a little bit of a respite from all the craziness of the week. It's looked at as an off day. Says the Orachaim, that's one level to Shabbat. That's Shabbat menuha. But the higher level of Shabbat is la'asot et ha'Shabbat. To recognize that it's a day of asiyah. It's a day of opportunity as opposed to simply a day of relaxation. The whole idea of the relaxation that Shabbat offers us is to get away from the mundane and to get away from all that craziness but not to just chill. But in order to say, okay, now I have this vacuum of time that's open, that's available, that I can take and I can devote now to spirituality. We live our life in a way where the busy world we live in with no stop sometimes distracts us from the bigger purpose of what we're doing over here. The bigger purpose of what a Jew has to do is to try and attain in his life a certain measure of holiness, a certain measure of kedushah. During the week we have sparks of that here and there. I come to shul in the morning, I learn a little Torah, I go to, I pray, I this, I that, I hear the Torah on the way. But most of our day is filled with having to take care of ourselves, our family, running around, taking care of errands. We're busy. Shabbat is a time where we say, phone's away. I'm not going to work. I'm not driving anywhere. I'm going to relax. I'm going to have a good dinner. But the ultimate goal there is not just a off day and a day to chill, but it's okay. Now how do I maximize this availability that I have? Am I setting time aside to learn a little Torah? Am I reviewing the parashah correctly? Am I doing shenayim mikra ve'ahad targum? Am I spending time talking over Torah with my family? How am I treating that time? What am I doing with that opportunity that Hashem sends our way? So it says, the Or HaChaim HaKadosh, that's what it means, la'asot et haShabbat. V'shamiru b'nei Yisrael et haShabbat. When I'm guarding and treating the Shabbat properly, which is me staying away from everything I'm not allowed to do, then I should be la'asot et haShabbat. Then I have to make the Shabbat. I have to turn the Shabbat into a situation where it's not just going to be a chill day, but it's going to be a day that I take advantage of, a day that I maximize and use the time properly. So that's first the Ibn Ezra, and that's the Or HaChaim.",
+      "updated_at": "2026-03-13T04:28:43.326337Z"
+    },
+    {
+      "raw_text": "pshat",
+      "replacement": "pshat",
+      "example_context": "That's the pshat (simple explanation) that the Ibn Ezra offers.",
+      "updated_at": "2026-03-13T04:28:43.326337Z"
+    },
+    {
+      "raw_text": "mamtin - waiting",
+      "replacement": "mematin (waiting/anticipating)",
+      "example_context": "The Orachaim over here that he was mamtin - waiting.",
+      "updated_at": "2026-03-13T04:39:33.170704Z"
+    },
+    {
+      "raw_text": "Rebit Tzadok HaKohen Meilublin",
+      "replacement": "Rabbi Tzadok HaKohen Milublin",
+      "example_context": "Then we went over Rebit Tzadok HaKohen Meilublin. Rebit Tzadok, who's a person who's talking about the uniqueness of Torah Shabbat Alpeh,",
+      "updated_at": "2026-03-13T04:28:43.326337Z"
+    },
+    {
+      "raw_text": "chet ha'egel (sin of the chet ha'egel (sin of the Golden Calf))",
+      "replacement": "chet ha'egel (sin of the Golden Calf)",
+      "example_context": "We have chet ha'egel (sin of the chet ha'egel (sin of the Golden Calf)) with the Jewish people, straight from Hashem.",
+      "updated_at": "2026-03-13T04:39:33.170704Z"
+    },
+    {
+      "raw_text": "Shabbat Malchuta is arriving",
+      "replacement": "Shabbat Malketa is arriving",
+      "example_context": "Kiddush is us sanctifying the Shabbat. And the rabbis all respond, no. The Shabbat is there and we're noting its arrival. Right? The Shabbat Malchuta is arriving and we're acknowledging its presence.",
+      "updated_at": "2026-03-13T04:39:33.170704Z"
+    },
+    {
+      "raw_text": "Al-Piyapshat",
+      "replacement": "Al HaPeshat (on the simple meaning)",
+      "example_context": "The Ibn Ezra talks about Al-Piyapshat. This idea of what it means to La'asot et haShabbat (the Shabbat).",
+      "updated_at": "2026-03-13T04:39:33.170704Z"
+    },
+    {
+      "raw_text": "pshat (simple explanation)",
+      "replacement": "peshat (simple explanation)",
+      "example_context": "That's the pshat (simple explanation) that the Ibn Ezra offers.",
+      "updated_at": "2026-03-13T04:39:33.170704Z"
+    },
+    {
+      "raw_text": "Orachaim HaKadosh",
+      "replacement": "Or HaChaim HaKadosh",
+      "example_context": "The Orachaim HaKadosh brings down another perush to this and he says that we see this word shamar elsewhere.",
+      "updated_at": "2026-03-13T04:39:33.170704Z"
+    },
+    {
+      "raw_text": "kedushah (holiness) (holiness)h",
+      "replacement": "kedushah (holiness)",
+      "example_context": "a certain measure of kedushah (holiness) (holiness)h. During the week we have sparks of that here and there.",
+      "updated_at": "2026-03-13T04:39:33.170704Z"
+    },
+    {
+      "raw_text": "Minhah (afternoon prayer) Narbit",
+      "replacement": "Minhah (afternoon prayer)",
+      "example_context": "And then your Shabbat afternoon has some Torah learning with it, and also Minhah (afternoon prayer) Narbit, your pre-Minhah (afternoon prayer) has a class.",
+      "updated_at": "2026-03-13T04:39:33.170704Z"
+    },
+    {
+      "raw_text": "mematin (waiting/anticipating)",
+      "replacement": "mehamen (anticipating)",
+      "example_context": "the Orachaim over here that he was mematin (waiting/anticipating). It didn't just mean he noted it in his head, but he was waiting with anticipation when is this going to happen.",
+      "updated_at": "2026-03-13T04:57:22.126981Z"
+    },
+    {
+      "raw_text": "pasuk, \u05d5\u05e9\u05de\u05e8\u05d5 \u05d1\u05e0\u05d9 \u05d9\u05e9\u05e8\u05d0\u05dc",
+      "replacement": "pasuk",
+      "example_context": "\u05d5\u05d6\u05d4\u05d5 \u05d4\u05e8\u05de\u05d6 \u05d1\u05e4asuk, \u05d5\u05e9\u05de\u05e8\u05d5 \u05d1\u05e0\u05d9 \u05d9\u05e9\u05e8\u05d0\u05dc.",
+      "updated_at": "2026-03-13T05:08:22.823797Z"
+    },
+    {
+      "raw_text": "set ha'kochavim",
+      "replacement": "tzeit ha-kochavim (nightfall)",
+      "example_context": "it ends at set ha'kochavim. It's a certain metzi'ut, a certain reality that we live in when we get to Shabbat.",
+      "updated_at": "2026-03-13T04:57:22.126981Z"
+    },
+    {
+      "raw_text": "Orachaim",
+      "replacement": "Or HaChaim",
+      "example_context": "The Or HaChaim HaKadosh brings down another perush to this and he says that we see this word shamar elsewhere. We go to Sefer Bereshit (Book of Genesis), back to Yaakov Avinu (Jacob our forefather), where Yosef (Joseph) had all these dreams and Yosef (Joseph) had these different ideas of what was going to be and the pasuk (verse) says ve'aviv shamar et ha'davar. His father, Yaakov Avinu (Jacob our forefather), after watching the interactions between Yosef (Joseph) and his brothers, he noted what was going on and says the Orachaim over here that he was mematin (waiting/anticipating).",
+      "updated_at": "2026-03-13T04:57:22.126981Z"
+    },
+    {
+      "raw_text": "la'asot et ha'Shabbat",
+      "replacement": "la'asot et haShabbat",
+      "example_context": "The Ibn Ezra talks about Al HaPeshat (on the simple meaning). This idea of what it means to La'asot et haShabbat (the Shabbat). To make the Shabbat.",
+      "updated_at": "2026-03-13T04:57:22.126981Z"
+    },
+    {
+      "raw_text": "v'shameru",
+      "replacement": "V'shamru (they shall guard) - the command to guard Shabbat",
+      "example_context": "We understand the idea of Veshameru. We talk about Veshameru very much. It usually means, Shamor ve'zachor, it means that a person has to be careful not to do any action that would violate the Shabbat.",
+      "updated_at": "2026-03-13T04:57:22.126981Z"
+    },
+    {
+      "raw_text": "Shabbat Malketa",
+      "replacement": "Shabbat Malka",
+      "example_context": "Kiddush is us sanctifying the Shabbat. And the rabbis all respond, no. The Shabbat is there and we're noting its arrival. Right? The Shabbat Malketa is arriving and we're acknowledging its presence.",
+      "updated_at": "2026-03-13T04:57:22.126981Z"
+    },
+    {
+      "raw_text": "mehamen (anticipating)",
+      "replacement": "mehamen - anticipating",
+      "example_context": "he was mehamen (anticipating). It didn't just mean he noted it in his head, but he was waiting with anticipation when is this going to happen.",
+      "updated_at": "2026-03-13T05:08:22.823797Z"
+    },
+    {
+      "raw_text": "\u05d4\u05e9\u05d1\u05ea toamea haimzachu",
+      "replacement": "to'amei ha'mitzvah - those who taste/enjoy the mitzvah",
+      "example_context": "The Shabbat toamea haimzachu, people who taste the beauty of Shabbat,",
+      "updated_at": "2026-03-13T05:08:22.823797Z"
+    },
+    {
+      "raw_text": "Rebit Tzadok",
+      "replacement": "Rabbi Tzadok",
+      "example_context": "Then we went over Rabbi Tzadok HaKohen Milublin. Rebit Tzadok, who's a person who's talking about the uniqueness of Torah she-be'al peh",
+      "updated_at": "2026-03-13T05:08:22.823797Z"
+    },
+    {
+      "raw_text": "Torah she-be'al peh (the Torah she-be'al peh (the Oral Torah)) Alpeh",
+      "replacement": "Torah she-be'al peh - the Oral Torah",
+      "example_context": "who's talking about the uniqueness of Torah she-be'al peh (the Torah she-be'al peh (the Oral Torah)) Alpeh,",
+      "updated_at": "2026-03-13T05:08:22.823797Z"
+    },
+    {
+      "raw_text": "She'khet taken srachav u'drachav b'yom ha'shishi",
+      "replacement": "Sheyikhtan srachav u'drachav b'yom ha'shishi - One should prepare broadly and extensively on the sixth day",
+      "example_context": "The Ibn Ezra says, She'khet taken srachav u'drachav b'yom ha'shishi - 'One should prepare broadly and extensively on the sixth day (Friday)'",
+      "updated_at": "2026-03-13T06:10:57.439456Z"
+    },
+    {
+      "raw_text": "mehamen - anticipating",
+      "replacement": "mechamen - 'anticipating' or 'expecting'",
+      "example_context": "he was mehamen - anticipating. It didn't just mean he noted it in his head, but he was waiting with anticipation",
+      "updated_at": "2026-03-13T05:24:41.192583Z"
+    },
+    {
+      "raw_text": "\u05d5\u05db\u05e9\u05e9\u05d5\u05de\u05e2 \u05e9\u05d1\u05ea \u05d0\u05d7\u05d3, \u05d0\u05d6 \u05e2\u05d5\u05d1\u05d3 \u05d0\u05ea \u05d4\u05e9\u05dd \u05d1\u05dc\u05d1 \u05ea\u05d4\u05e8\u05d5\u05e8 \u05db\u05dc \u05d4\u05e9\u05d1\u05d5\u05e2",
+      "replacement": "\u05d5\u05db\u05e9\u05d9\u05e9\u05de\u05d5\u05e8 \u05e9\u05d1\u05ea \u05d0\u05d7\u05d3 - 'and when one keeps one Shabbat'",
+      "example_context": "Talmud says, if the Jewish people keep one Shabbat the right way, we're going to see the Mashiach, we're going to see the Geulah, the redemption. \u05d5\u05db\u05e9\u05e9\u05d5\u05de\u05e2 \u05e9\u05d1\u05ea \u05d0\u05d7\u05d3, \u05d0\u05d6 \u05e2\u05d5\u05d1\u05d3 \u05d0\u05ea \u05d4\u05e9\u05dd \u05d1\u05dc\u05d1 \u05ea\u05d4\u05e8\u05d5\u05e8 \u05db\u05dc \u05d4\u05e9\u05d1\u05d5\u05e2.",
+      "updated_at": "2026-03-13T05:24:41.192583Z"
+    },
+    {
+      "raw_text": "\u05d5\u05e0\u05de\u05e6\u05d0 \u05d4\u05e2\u05d9\u05e7\u05e8 \u05d4\u05d5\u05d0 \u05e9\u05d1\u05ea \u05d0\u05d7\u05d3, \u05db\u05d9 \u05e2\u05dc \u05d9\u05d3\u05d9 \u05e9\u05d1\u05ea \u05d0\u05d7\u05d3 \u05d9\u05e9\u05de\u05d5\u05e8 \u05e9\u05d1\u05ea \u05e9\u05e0\u05d9 \u05d1\u05e7\u05dc \u05d5\u05db\u05df \u05dc\u05e2\u05d5\u05dc\u05dd",
+      "replacement": "\u05d9\u05e9\u05de\u05d5\u05e8 \u05e9\u05d1\u05ea \u05e9\u05e0\u05d9 \u05d1\u05e7\u05dc\u05d5\u05ea \u05d5\u05db\u05df \u05dc\u05e2\u05d5\u05dc\u05dd - 'will keep the second Shabbat easily and forever'",
+      "example_context": "\u05d5\u05e0\u05de\u05e6\u05d0 \u05d4\u05e2\u05d9\u05e7\u05e8 \u05d4\u05d5\u05d0 \u05e9\u05d1\u05ea \u05d0\u05d7\u05d3, \u05db\u05d9 \u05e2\u05dc \u05d9\u05d3\u05d9 \u05e9\u05d1\u05ea \u05d0\u05d7\u05d3 \u05d9\u05e9\u05de\u05d5\u05e8 \u05e9\u05d1\u05ea \u05e9\u05e0\u05d9 \u05d1\u05e7\u05dc \u05d5\u05db\u05df \u05dc\u05e2\u05d5\u05dc\u05dd. And that's how he deals with the contradiction.",
+      "updated_at": "2026-03-13T05:24:41.192583Z"
+    },
+    {
+      "raw_text": "\u05d5\u05d6\u05d4\u05d5 \u05d4\u05e8\u05de\u05d6 \u05d1\u05e4asuk",
+      "replacement": "pasuk",
+      "example_context": "\u05d5\u05d6\u05d4\u05d5 \u05d4\u05e8\u05de\u05d6 \u05d1\u05e4asuk, \u05d5\u05e9\u05de\u05e8\u05d5 \u05d1\u05e0\u05d9 \u05d9\u05e9\u05e8\u05d0\u05dc. And that's how he explained the pasuk (verse).",
+      "updated_at": "2026-03-13T05:24:41.192583Z"
+    },
+    {
+      "raw_text": "The Shabbat toamea haimzachu",
+      "replacement": "to'amei ha'mitzvah - 'those who taste the commandment'",
+      "example_context": "The Shabbat toamea haimzachu, people who taste the beauty of Shabbat, there's zocheh to have real life.",
+      "updated_at": "2026-03-13T05:24:41.192583Z"
+    },
+    {
+      "raw_text": "\u05dc\u05e2\u05e9\u05d9\u05d9\u05d4, to connect and to do,",
+      "replacement": "\u05dc\u05e2\u05e9\u05d9\u05d9\u05d4, to connect and to do,",
+      "example_context": "it's not to chill and relax, but it's to \u05dc\u05e2\u05e9\u05d9\u05d9\u05d4, to connect and to do, connect to Hashem in a much higher way,",
+      "updated_at": "2026-03-13T05:24:41.192583Z"
+    },
+    {
+      "raw_text": "mekhamen - 'anticipating' or 'expecting'",
+      "replacement": "mekhamen - 'anticipating' or 'expecting'",
+      "example_context": "the Or HaChaim over here that he was mechamen - 'anticipating' or 'expecting'. It didn't just mean he noted it in his head, but he was waiting with anticipation when is this going to happen.",
+      "updated_at": "2026-03-13T06:01:01.672732Z"
+    },
+    {
+      "raw_text": "yisur melechah",
+      "replacement": "issur melacha - prohibition of work",
+      "example_context": "I'm doing actions that'll help me deal with V'shamru (they shall guard) - the command to guard Shabbat later on. The la'asot that I do on Friday afternoon will help me avoid doing any yisur melechah, any prohibition when Shabbat eventually arrives.",
+      "updated_at": "2026-03-13T05:31:43.856313Z"
+    },
+    {
+      "raw_text": "shenayim mikra ve'ahad targum",
+      "replacement": "Shnayim mikra ve-echad targum - reading the Torah portion twice and one translation",
+      "example_context": "Am I reviewing the parashah correctly? Am I doing shenayim mikra ve'ahad targum? Am I spending time talking over Torah with my family?",
+      "updated_at": "2026-03-13T05:31:43.856313Z"
+    },
+    {
+      "raw_text": "to'amei ha'mitzvah",
+      "replacement": "to'amei ha-mitzvah - those who taste the commandment",
+      "example_context": "and all of a sudden you put him to a Shabbat dinner, and he's convinced, it's all over, I got it, I understand the secret. to'amei ha'mitzvah - 'those who taste the commandment', people who taste the beauty of Shabbat, there's zocheh to have real life.",
+      "updated_at": "2026-03-13T05:31:43.856313Z"
+    },
+    {
+      "raw_text": "\u05dc\u05e2\u05e9\u05d5\u05ea \u05d0\u05ea \u05d4\u05e9\u05d1\u05ea \u05d5\u05e9\u05de\u05e8\u05d5 \u05d1\u05e2\u05e6\u05dd \u05d0\u05ea \u05d4\u05e9\u05d1\u05ea",
+      "replacement": "to'amei ha-mitzvot - those who taste the commandments",
+      "example_context": "And that's what we're saying over here, \u05dc\u05e2\u05e9\u05d5\u05ea \u05d0\u05ea \u05d4\u05e9\u05d1\u05ea \u05d5\u05e9\u05de\u05e8\u05d5 \u05d1\u05e2\u05e6\u05dd \u05d0\u05ea \u05d4\u05e9\u05d1\u05ea, when we keep and guard the Shabbat the right way, we're going to be \u05dc\u05e2\u05e9\u05d5\u05ea \u05d0\u05ea \u05d4\u05e9\u05d1\u05ea,",
+      "updated_at": "2026-03-13T06:01:01.672732Z"
+    },
+    {
+      "raw_text": "pasuk (verse) says ve'aviv shamar et ha'davar",
+      "replacement": "ve'aviv shamar et ha'davar - and his father heard of the matter.",
+      "example_context": "where Yosef (Joseph) had these different ideas of what was going to be and the pasuk (verse) says ve'aviv shamar et ha'davar.",
+      "updated_at": "2026-03-13T05:40:53.699205Z"
+    },
+    {
+      "raw_text": "Shabbat menuha",
+      "replacement": "menuha (\u05de\u05e0\u05d5\u05d7\u05d4) - rest",
+      "example_context": "Says the Or HaChaim, that's one level to Shabbat. That's Shabbat menuha. But the higher level of Shabbat is la'asot et haShabbat.",
+      "updated_at": "2026-03-13T05:40:53.699205Z"
+    },
+    {
+      "raw_text": "Shnayim mikra ve-echad targum",
+      "replacement": "Shnayim mikra ve-echad targum - reading the weekly Torah portion twice in Hebrew and once in translation",
+      "example_context": "Am I reviewing the parashah correctly? Am I doing Shnayim mikra ve-echad targum - reading the weekly Torah portion twice in Hebrew and once in translation Am I spending time talking over Torah with my family?",
+      "updated_at": "2026-03-13T06:21:45.115772Z"
+    },
+    {
+      "raw_text": "to'amei ha-mitzvah - those who taste the commandment",
+      "replacement": "to'amei ha-mitzvot - those who taste the commandments",
+      "example_context": "and he's convinced, it's all over, I got it, I understand the secret. to'amei ha-mitzvah - those who taste the commandment - 'those who taste the commandment', people who taste the beauty of Shabbat,",
+      "updated_at": "2026-03-13T06:01:01.672732Z"
+    },
+    {
+      "raw_text": "Shnayim mikra ve-echad targum (\u05e9\u05e0\u05d9\u05d9\u05dd \u05de\u05e7\u05e8\u05d0 \u05d5\u05d0\u05d7\u05d3 \u05ea\u05e8\u05d2\u05d5\u05dd)",
+      "replacement": "Shnayim mikra ve-echad targum - reading the weekly Torah portion twice in Hebrew and once in translation",
+      "example_context": "Am I reviewing the parashah correctly? Am I doing Shnayim mikra ve-echad targum (\u05e9\u05e0\u05d9\u05d9\u05dd \u05de\u05e7\u05e8\u05d0 \u05d5\u05d0\u05d7\u05d3 \u05ea\u05e8\u05d2\u05d5\u05dd) - reading the weekly Torah portion twice in Hebrew and once in translation - reading the Torah portion twice and one translation?",
+      "updated_at": "2026-03-13T06:01:01.672732Z"
+    },
+    {
+      "raw_text": "kevi'ah ve'kayma",
+      "replacement": "kevi'ah ve-kayam - fixed and enduring",
+      "example_context": "Shabbat is, as the Gemara says, kevi'ah ve'kayma, it is. It's a constant. It's something that hits right at sunset and it ends at tzeit ha-kochavim (nightfall).",
+      "updated_at": "2026-03-13T06:01:01.672732Z"
+    },
+    {
+      "raw_text": "la'asot et haShabbat (the Shabbat)",
+      "replacement": "la'asot et haShabbat - to make the Shabbat",
+      "example_context": "But when it comes to the idea of La'asot et haShabbat (the Shabbat), to make the Shabbat, to create the Shabbat, the rabbis all wonder, what does it mean to make the Shabbat, to create the Shabbat?",
+      "updated_at": "2026-03-13T06:01:01.672732Z"
+    },
+    {
+      "raw_text": "\u05dc\u05e2\u05e9\u05d9\u05d9\u05d4",
+      "replacement": "le'asiyah - to do, to engage in action",
+      "example_context": "it's not to chill and relax, but it's to \u05dc\u05e2\u05e9\u05d9\u05d9\u05d4, to connect and to do, and connect to Hashem in a much higher way,",
+      "updated_at": "2026-03-13T06:01:01.672732Z"
+    },
+    {
+      "raw_text": "machatzit hashekel (half-shekel), the machatzit hashekel (half-shekel), which we read a few weeks ago in the parashah.",
+      "replacement": "machatzit hashekel (half-shekel)",
+      "example_context": "We start off with the machatzit hashekel (half-shekel), the machatzit hashekel (half-shekel), which we read a few weeks ago in the parashah.",
+      "updated_at": "2026-03-13T06:10:57.439456Z"
+    },
+    {
+      "raw_text": "Shamor ve'zachor",
+      "replacement": "shamor ve-zakhor - guard and remember",
+      "example_context": "We understand the idea of Veshameru. We talk about Veshameru very much. It usually means, Shamor ve'zachor, it means that a person has to be careful not to do any action that would violate the Shabbat.",
+      "updated_at": "2026-03-13T06:10:57.439456Z"
+    },
+    {
+      "raw_text": "mechamen - 'anticipating' or 'expecting'",
+      "replacement": "mechamen (\u05de\u05b0\u05d7\u05b7\u05de\u05b5\u05bc\u05df) - anticipating",
+      "example_context": "he was mechamen - 'anticipating' or 'expecting'. It didn't just mean he noted it in his head, but he was waiting with anticipation",
+      "updated_at": "2026-03-13T06:10:57.439456Z"
+    },
+    {
+      "raw_text": "Shnayim mikra ve-echad targum - reading the weekly Torah portion twice in Hebrew and once in translation - reading the weekly Torah portion twice in Hebrew and once in translation - reading the Torah portion twice and one translation?",
+      "replacement": "Shnayim mikra ve-echad targum - reading the weekly Torah portion twice in Hebrew and once in translation",
+      "example_context": "Am I doing Shnayim mikra ve-echad targum - reading the weekly Torah portion twice in Hebrew and once in translation - reading the weekly Torah portion twice in Hebrew and once in translation - reading the Torah portion twice and one translation?",
+      "updated_at": "2026-03-13T06:10:57.439456Z"
+    },
+    {
+      "raw_text": "to'amei ha-mitzvot - those who taste the commandments - 'those who taste the commandment'",
+      "replacement": "to'amei ha-mitzvot - those who taste the commandments",
+      "example_context": "and all of a sudden you put him to a Shabbat dinner, and he's convinced, it's all over, I got it, I understand the secret. to'amei ha-mitzvot - those who taste the commandments - 'those who taste the commandment', people who taste the beauty of Shabbat,",
+      "updated_at": "2026-03-13T06:10:57.439456Z"
+    },
+    {
+      "raw_text": "menuchah (rest) (rest)",
+      "replacement": "menuchah (rest)",
+      "example_context": "because when we disconnect and we experience real menuchah (rest) (rest), it's not to chill and relax, but it's to le'asiyah - to do, to engage in action, to connect and to do,",
+      "updated_at": "2026-03-13T06:10:57.439456Z"
+    },
+    {
+      "raw_text": "mechamen (\u05de\u05b0\u05d7\u05b7\u05de\u05b5\u05bc\u05df)",
+      "replacement": "mechamen - anticipating",
+      "example_context": "he was mechamen (\u05de\u05b0\u05d7\u05b7\u05de\u05b5\u05bc\u05df) - anticipating. It didn't just mean he noted it in his head, but he was waiting with anticipation when is this going to happen.",
+      "updated_at": "2026-03-13T06:21:45.115772Z"
+    },
+    {
+      "raw_text": "ve'aviv shamar et ha'davar",
+      "replacement": "ve'aviv shamar et ha'davar - and his father heard of the matter",
+      "example_context": "where Yosef (Joseph) had all these dreams and Yosef (Joseph) had these different ideas of what was going to be and the ve'aviv shamar et ha'davar - and his father heard of the matter..",
+      "updated_at": "2026-03-13T06:21:45.115772Z"
+    },
+    {
+      "raw_text": "to'amei ha-mitzvot",
+      "replacement": "to'amei ha-mitzvot - those who taste the commandments",
+      "example_context": "and he's convinced, it's all over, I got it, I understand the secret. to'amei ha-mitzvot - those who taste the commandments, people who taste the beauty of Shabbat,",
+      "updated_at": "2026-03-13T06:21:45.115772Z"
+    },
+    {
+      "raw_text": "\u05dc\u05e2\u05e9\u05d5\u05ea \u05d0\u05ea \u05d4\u05e9\u05d1\u05ea",
+      "replacement": "la'asot et haShabbat - to make the Shabbat",
+      "example_context": "\u05d5\u05e9\u05de\u05e8\u05d5 \u05d1\u05e0\u05d9 \u05d9\u05e9\u05e8\u05d0\u05dc \u05d0\u05ea \u05d4\u05e9\u05d1\u05ea, \u05dc\u05e2\u05e9\u05d5\u05ea \u05d0\u05ea \u05d4\u05e9\u05d1\u05ea, he says that this idea of \u05dc\u05e2\u05e9\u05d5\u05ea \u05d0\u05ea \u05d4\u05e9\u05d1\u05ea is us doing what we need to do on Erev Shabbat (Friday leading into Shabbat),",
+      "updated_at": "2026-03-13T06:21:45.115772Z"
+    },
+    {
+      "raw_text": "chibat b'nei Yisrael b'nei HaMakom",
+      "replacement": "chibat Bnei Yisrael (love of the children of Israel)",
+      "example_context": "He says, there was a chibat b'nei Yisrael b'nei HaMakom. We're revealing here the great love Hashem has for the Jewish people.",
+      "updated_at": "2026-03-13T12:45:49.099900Z"
+    },
+    {
+      "raw_text": "Mahasit HaShekel obligation",
+      "replacement": "machatzit hashekel (half-shekel)",
+      "example_context": "Rabbi, how much exactly do I have to give to fulfill my Mahasit HaShekel obligation? You're giving Mahasit HaShekel, that we had Purim last week.",
+      "updated_at": "2026-03-13T12:45:49.099900Z"
+    },
+    {
+      "raw_text": "Mishnah B'Ruah",
+      "replacement": "Mishnah Berurah (a commentary on the Shulchan Aruch)",
+      "example_context": "And the Mishnah B'Ruah elaborates. He says, and this comes, this idea of better few prayers than many prayers, if it's being done correctly, he says, he quotes the Gemara Menachot...",
+      "updated_at": "2026-03-13T12:45:49.099900Z"
+    },
+    {
+      "raw_text": "the altar of Kelm",
+      "replacement": "Alter of Kelm (the elder of Kelm)",
+      "example_context": "We'll finish off here with a line from the altar of Kelm, the altar of Kelm, one of the great rabbis of the Musar movement.",
+      "updated_at": "2026-03-13T12:45:49.099900Z"
+    },
+    {
+      "raw_text": "Chovah Tevarim",
+      "replacement": "Chovah Tevarim, (with my limbs)",
+      "example_context": "like we mentioned lastly, Chovah Tevarim, with my limbs, I did my mitzvah with my limbs.",
+      "updated_at": "2026-03-13T12:45:49.099900Z"
+    },
+    {
+      "raw_text": "Rahamana Libaba'e",
+      "replacement": "Rachamana Libava (The Merciful One of the heart)",
+      "example_context": "Hashem wants us, the merciful one, He wants us to come with our heart. Do it with devotion, do it with sincerity, and do it with a realness, a genuine service of Avodat Hashem. That's the idea, says the altar of Chilm, Be'ezrat Hashem.",
+      "updated_at": "2026-03-13T12:45:49.099900Z"
+    },
+    {
+      "raw_text": "Be'ed Mayim Chayim",
+      "replacement": "Be'er Mayim Chayim (Well of Living Waters)",
+      "example_context": "and also the Olam Chayim, when we do things right, when we have that generosity, Hashem is going to accept it all. Be'ezrat Hashem, we can take these different ideas that we spoke about today and bring them in practice into our life, Be'ezrat Hashem.",
+      "updated_at": "2026-03-13T12:45:49.099900Z"
+    },
+    {
+      "raw_text": "tarot every day",
+      "replacement": "devar torah",
+      "example_context": "So I'll tell you something that Raymond is away this week, so I gave him a tarot every day.",
+      "updated_at": "2026-03-13T14:04:27.330778Z"
+    },
+    {
+      "raw_text": "Imre Shefer",
+      "replacement": "Imrei Shefer",
+      "example_context": "So one of them, I found a fascinating tarot in the Sefer called Imre Shefer. Imre Shefer was a rabbi.",
+      "updated_at": "2026-03-13T14:04:27.330778Z"
+    },
+    {
+      "raw_text": "Magallan Makot",
+      "replacement": "Magallan Makot",
+      "example_context": "His name was Reynason Shapiro. He's the grandfather of Magallan Makot. Magallan Makot was also named Reynason Shapiro.",
+      "updated_at": "2026-03-13T14:04:27.330778Z"
+    },
+    {
+      "raw_text": "Oel Moed",
+      "replacement": "Ohel Moed - Tent of Meeting",
+      "example_context": "So it says Petach Oel Moed, that the ladies came in droves to the doorway of the Oel Moed. What's the Oel Moed? No, I'm saying the Oel Moed is usually referred to as the Mishkan.",
+      "updated_at": "2026-03-13T14:04:27.330778Z"
+    },
+    {
+      "raw_text": "Qumaz",
+      "replacement": "Quamaz - ornament",
+      "example_context": "So the obvious question is, one of the ornaments that were given to the Mishkan was something called Qumaz. Right? So Rashi said, what is this Qumaz business?",
+      "updated_at": "2026-03-13T14:04:27.330778Z"
+    },
+    {
+      "raw_text": "Shinu Maase, Shinu Hashem",
+      "replacement": "Shinui Ma'aseh - change of the object",
+      "example_context": "He stands it down, he does this, Shinu Maase, Shinu Hashem. Now it's called something else, and it's made into something else.",
+      "updated_at": "2026-03-13T14:04:27.330778Z"
+    },
+    {
+      "raw_text": "Men Shivat Nefesh",
+      "replacement": "Yeshivat Nefesh - name of a sefer",
+      "example_context": "Kedush Yadayim V'raglayim. Says the Men Shivat Nefesh that when they came to the Kiyor to wash their hands...",
+      "updated_at": "2026-03-13T14:04:27.330778Z"
+    },
+    {
+      "raw_text": "Hikom? No, Hikom Lekrat HaNokei Yisrael",
+      "replacement": "Hikom - prepare",
+      "example_context": "Because the Pasuk says, Hikom? No, Hikom Lekrat HaNokei Yisrael. Right? You should prepare yourself before you go...",
+      "updated_at": "2026-03-13T14:04:27.330778Z"
+    },
+    {
+      "raw_text": "laws of Kizuna",
+      "replacement": "Kedushah (holiness)",
+      "example_context": "He's teaching Aharon, his brother, the laws of Kizuna. And they couldn't lift the boards of the Mishkan.",
+      "updated_at": "2026-03-13T15:30:56.041422Z"
+    },
+    {
+      "raw_text": "Bed of Midrash",
+      "replacement": "Beit Midrash (house of study)",
+      "example_context": "The erecting of the walls of the Bed of Midrash was designated for who, Stevie? Only Moshe Rabbeinu.",
+      "updated_at": "2026-03-13T15:30:56.041422Z"
+    },
+    {
+      "raw_text": "kiyor",
+      "replacement": "Kiyor (washbasin in the Mishkan)",
+      "example_context": "God says, no, I love it. This is what I want. This is what I want, and I'm going to use it on the kiyor.",
+      "updated_at": "2026-03-13T15:30:56.041422Z"
+    },
+    {
+      "raw_text": "Sepharite I saw brought down",
+      "replacement": "Sefer HaYashar brought down",
+      "example_context": "Chazal says, the Sepharite I saw brought down. He says because the ladies weren't allowed to bring it.",
+      "updated_at": "2026-03-13T15:30:56.041422Z"
+    },
+    {
+      "raw_text": "The Israel of Yashiv",
+      "replacement": "The Israel of Yashiv - Commentator on the Torah",
+      "example_context": "Oh, that's a good question. We'll see in a second. The Israel of Yashiv, very interesting.",
+      "updated_at": "2026-03-13T15:30:56.041422Z"
+    },
+    {
+      "raw_text": "Lama Isha Doma L'Dvash",
+      "replacement": "Lama Isha Domeh L'Dvash (Why is a woman compared to honey?)",
+      "example_context": "Lama Isha Doma L'Dvash. Why? I told you this. They asked why is a lady compared to honey?",
+      "updated_at": "2026-03-13T15:30:56.041422Z"
+    },
+    {
+      "raw_text": "Hamishah Humshid Torah",
+      "replacement": "Hamishah Humshei Torah - The 5 books of Torah",
+      "example_context": "In the story of Yitzyat Mitzrayim, in the Hamishah Humshid Torah, does it ever reference Yitzyat Mitzrayim as freedom?",
+      "updated_at": "2026-03-15T16:08:30.810556Z"
+    },
+    {
+      "raw_text": "avadim hayinu lefaromi mitzrayim",
+      "replacement": "avadim hayinu le'par'oh be'mitzrayim - we were slaves to pharaoh of Egypt",
+      "example_context": "Hallelujah, hallelu avdei Hashem. So, when you look at that word, avdei Hashem, it takes Selly's idea and really saying, look, avadim hayinu lefaromi mitzrayim, and now we're avdei Hashem.",
+      "updated_at": "2026-03-15T16:08:30.810556Z"
+    },
+    {
+      "raw_text": "Selly",
+      "replacement": "Not sure. Seems like a name.",
+      "example_context": "The Torah does exactly what Selly does. What's the first of the Ten Commandments?",
+      "updated_at": "2026-03-15T16:08:30.810556Z"
+    },
+    {
+      "raw_text": "Yitzyat Mitzrayim",
+      "replacement": "Yitzyat Mitzrayim - exodus from egypt. Kriyat Yam Suf - splitting of the sea",
+      "example_context": "You know how to have the seal of the United States, an eagle, like the presidential seal? When Benjamin Franklin wanted to do a picture of Yitzyat Mitzrayim, of Kiriat Yom Suf, the Jewish people crossing the sea, a freedom from tyranny, right?",
+      "updated_at": "2026-03-15T16:08:30.810556Z"
+    },
+    {
+      "raw_text": "Me'avid la'adon",
+      "replacement": "Me'avad le'adon (from slave to master)",
+      "example_context": "The word we would say in Hebrew, going from a slave to a master, right? Me'avid la'adon.",
+      "updated_at": "2026-03-15T16:08:30.810556Z"
+    },
+    {
+      "raw_text": "eved avadim Hashem",
+      "replacement": "avadim l'Hashem (servants of God)",
+      "example_context": "I mean, we're still eved avadim Hashem.",
+      "updated_at": "2026-03-15T16:08:30.810556Z"
+    },
+    {
+      "raw_text": "I wonder if it's a Haggadah or...",
+      "replacement": "Haggadah = haggadah",
+      "example_context": "Okay. I wonder if it's a Haggadah or...",
+      "updated_at": "2026-03-15T16:08:30.810556Z"
+    },
+    {
+      "raw_text": "Mizmor Kuflamet Vav",
+      "replacement": "Mizmor Kuf Lamed Vav - Psalm 136 (Psalm 136 is sometimes referred to by its first words)",
+      "example_context": "Okay, so let's begin. Why are we learning Mizmor Kuflamet Vav? And the answer is because it connects to the Haggadah.",
+      "updated_at": "2026-03-15T16:22:50.162825Z"
+    },
+    {
+      "raw_text": "Hilal Ham Hasdo",
+      "replacement": "Ki Leolam hasdo",
+      "example_context": "So it's a unique Mizmor because every Pasuk ends with the words, Hilal Ham Hasdo.",
+      "updated_at": "2026-03-15T16:22:50.162825Z"
+    },
+    {
+      "raw_text": "Palmayim",
+      "replacement": "Pelamim - 'double' or 'twice' (referring to doubling the number 26)",
+      "example_context": "How do they get to 52? Because it's Palmayim, double 26.",
+      "updated_at": "2026-03-15T16:22:50.162825Z"
+    },
+    {
+      "raw_text": "Matantura",
+      "replacement": "Matan Torah - 'the giving of the Torah'",
+      "example_context": "So, Raquel is asking an interesting question. Why don't we talk about Matantura? So, my argument would be like this.",
+      "updated_at": "2026-03-15T16:22:50.162825Z"
+    },
+    {
+      "raw_text": "B'Kat HaMasaron",
+      "replacement": "'Birkat HaMazon' (Grace after meals)",
+      "example_context": "Right before we're going to drink the fourth cup of wine after B'Kat HaMasaron.",
+      "updated_at": "2026-03-15T16:22:50.162825Z"
+    },
+    {
+      "raw_text": "Perek Havav",
+      "replacement": "Perek Havav",
+      "example_context": "In Devarim, Perek Havav, the Torah tells us, When you're going to bring Bikurim...",
+      "updated_at": "2026-03-15T16:22:50.162825Z"
+    },
+    {
+      "raw_text": "Aseret HaDibu",
+      "replacement": "Aseret HaDibrot - 'The Ten Commandments'",
+      "example_context": "And that secret is already taught to us in the Aseret HaDibu. I took you out of Egypt...",
+      "updated_at": "2026-03-15T16:22:50.162825Z"
+    },
+    {
+      "raw_text": "al-afin",
+      "replacement": "not sure",
+      "example_context": "Right, she's talking about the actual Holocaust. Yeah, it's a different word. Oh, yeah, yeah, yeah. Right, but we don't have, we don't say, we say al-afin. Same thing. Fam, al-afin, yeah, Egyptian, Arabic.",
+      "updated_at": "2026-03-15T16:42:12.303584Z"
+    },
+    {
+      "raw_text": "Sadi Hei",
+      "replacement": "Sadik Hei - Page 95",
+      "example_context": "Ah, Sadi Hei. Okay. Sadi Hei, the end of Magid. Let's take a look. What is it talking about?",
+      "updated_at": "2026-03-15T16:42:12.303584Z"
+    },
+    {
+      "raw_text": "Api Hapshat",
+      "replacement": "Al Pi hapshat",
+      "example_context": "The Ibn Ezra talks about Api Hapshat, this idea of what it means to La'asot et HaShabbat, to make the Shabbat.",
+      "updated_at": "2026-03-15T17:47:58.015746Z"
+    },
+    {
+      "raw_text": "Orachayim",
+      "replacement": "Orach Chaim",
+      "example_context": "and says the Orachayim over here that he was mamtin umtsape matayavo.",
+      "updated_at": "2026-03-15T17:47:58.015746Z"
+    },
+    {
+      "raw_text": "mamtin umtsape matayavo",
+      "replacement": "mamtim - waiting or anticipating",
+      "example_context": "he was mamtin umtsape matayavo. It didn't just mean he noted it in his head, but he was waiting with anticipation",
+      "updated_at": "2026-03-15T17:47:58.015746Z"
+    },
+    {
+      "raw_text": "Setah Kochavim",
+      "replacement": "tzeit ha-kochavim - nightfall (appearance of stars)",
+      "example_context": "it ends at Setah Kochavim. It's a certain reality that we live in when we get to Shabbat.",
+      "updated_at": "2026-03-15T17:47:58.015746Z"
+    },
+    {
+      "raw_text": "Yorah haim ha'kadosh",
+      "replacement": "Yorah haim ha'kadosh",
+      "example_context": "So it says, Yorah haim ha'kadosh, that's what it means, la'asot et haShabbat.",
+      "updated_at": "2026-03-15T17:47:58.015746Z"
+    },
+    {
+      "raw_text": "Rabbi Sadokah Kohen Milublin",
+      "replacement": "Rabbi Sadok HaKohen Midublin",
+      "example_context": "A third approach that we have is the approach of Rabbi Sadokah Kohen Milublin. Rabbi Sadokah Kohen Milublin lived about 125 years ago.",
+      "updated_at": "2026-03-15T17:47:58.015746Z"
+    },
+    {
+      "raw_text": "Torah Sheb Echtav",
+      "replacement": "Torah Shemichtav- written torah",
+      "example_context": "the Torah Sheb Echtav, the written Torah, which is finite, which is there.",
+      "updated_at": "2026-03-15T17:47:58.015746Z"
+    },
+    {
+      "raw_text": "Torah Sheva Alpeh",
+      "replacement": "Sheva Alpeh",
+      "example_context": "who's a person who's talking about the uniqueness of Torah Sheva Alpeh, he says Shabbat has holiness,",
+      "updated_at": "2026-03-15T17:47:58.015746Z"
+    },
+    {
+      "raw_text": "menhah",
+      "replacement": "minhah",
+      "example_context": "We'll talk about the menhah offerings that are being in this Mishnah. A person would normally bring the flour that he's going to use for the menhah to the courtyard of the Bet HaMikdash",
+      "updated_at": "2026-03-15T19:11:15.787150Z"
+    },
+    {
+      "raw_text": "kometz",
+      "replacement": "kemitzah",
+      "example_context": "Ava mo'alin bakometz ad she'etzeh lebet hadashen. But the kometz that was offered on the mezbeach, that's entirely burned on the mezbeach, me'ilah still applies because the ashes are supposed to go out to the bet hadashen",
+      "updated_at": "2026-03-15T19:11:15.787150Z"
+    },
+    {
+      "raw_text": "bet hadashen",
+      "replacement": "beit hadashen",
+      "example_context": "Ava mo'alin bakometz ad she'etzeh lebet hadashen. But the kometz that was offered on the mezbeach, that's entirely burned on the mezbeach, me'ilah still applies because the ashes are supposed to go out to the bet hadashen, the place of ashes outside of Yerushalayim.",
+      "updated_at": "2026-03-15T19:11:15.787150Z"
+    },
+    {
+      "raw_text": "sa'ya",
+      "replacement": "Seder (order) - the ritual meal on the night of Passover",
+      "example_context": "It is sa'ya? It is not sa'ya? No, it is not sa'ya. Okay, so, we are going to talk about, the night of the said, that we talk about this idea of freedom.",
+      "updated_at": "2026-03-15T20:35:41.069787Z"
+    },
+    {
+      "raw_text": "pashuk",
+      "replacement": "pasuk (verse)",
+      "example_context": "No, I just need it from one pashuk. We talked about this idea of freedom, on the night of the sa'ya, right?",
+      "updated_at": "2026-03-15T20:35:41.069787Z"
+    },
+    {
+      "raw_text": "parol",
+      "replacement": "Paro (Pharaoh) - the Egyptian king",
+      "example_context": "The Torah is interested in talking about the transference of servitude from parol to Hashem. When you're serving parol, it's for parol's interests.",
+      "updated_at": "2026-03-15T20:35:41.069787Z"
+    },
+    {
+      "raw_text": "Hamishah, Hamishah Torah",
+      "replacement": "Chumash HaTorah (The Five Books of Moses)",
+      "example_context": "In the story of Yitzi'at Mitzrayim, in the Hamishah, Hamishah Torah, does it ever reference Yitzi'at Mitzrayim as freedom?",
+      "updated_at": "2026-03-15T20:35:41.069787Z"
+    },
+    {
+      "raw_text": "halayluya halayluh abdeh Hashem",
+      "replacement": "Haleluya halelu avdei Hashem (Praise the Lord, praise the servants of the Lord)",
+      "example_context": "Normally, I would like to, I like to say like this, on the Pesah said that we say halayla to end. That's basically the last thing you're saying, halayl and then near tzah. And how does halayl begin? Halayluya halayluh abdeh Hashem.",
+      "updated_at": "2026-03-15T20:35:41.069787Z"
+    },
+    {
+      "raw_text": "Ayikra",
+      "replacement": "Vayikra (Leviticus)",
+      "example_context": "And it also kind of reminds me of Ayikra and some of the places we did that if God didn't give you a lot of these kind of rules and restrictions for guiding you in your life...",
+      "updated_at": "2026-03-15T20:35:41.069787Z"
+    },
+    {
+      "raw_text": "Gimbi Mitzvot",
+      "replacement": "Gadrei Mitzvot (boundaries of commandments)",
+      "example_context": "The Torah is in the Gimbi Mitzvot that are going to create an environment in which I could actually become somebody who's in charge of my desires...",
+      "updated_at": "2026-03-15T20:35:41.069787Z"
+    },
+    {
+      "raw_text": "night of the sedent",
+      "replacement": "night of the Seder (Passover ritual meal)",
+      "example_context": "Meaning, yes, you have freedom. I'm not making you choose, but I will tell you, there's going to be a consequence. And that's essentially what we do on the night of the Seder, I think. Meaning, why do I need to have education? ... So either I'm going to use it for a career or I'm going to use it for political agendas. And that's kind of the problem we have today. But meaning, go back to the night of the sedent. What is the night of the sedent, telling the parents...",
+      "updated_at": "2026-03-15T20:35:41.069787Z"
+    },
+    {
+      "raw_text": "Mishnah het",
+      "replacement": "Mishnah het (Mishnah chapter)",
+      "example_context": "Forsachet mere'ila' perikbet, Mishnah het, we'll talk about the Minha offerings that are eaten in this Mishnah.",
+      "updated_at": "2026-03-15T21:08:02.940538Z"
+    },
+    {
+      "raw_text": "Kleh Sharet",
+      "replacement": "Kleh Sharet (holy utensil)",
+      "example_context": "A person would normally bring the flower that he's going to use for the Minha to the courtyard of the Betah Miktash, and he would place it in a Kleh Sharet, a holy utensil.",
+      "updated_at": "2026-03-15T21:08:02.940538Z"
+    },
+    {
+      "raw_text": "Kohen",
+      "replacement": "Kohen (priest)",
+      "example_context": "The Kohen scoops up a fistful of the Minha with his hand, which is like the Shehitaven animal, which would draw forth blood.",
+      "updated_at": "2026-03-15T21:08:02.940538Z"
+    },
+    {
+      "raw_text": "Matan Ba'keli",
+      "replacement": "Matan Ba'keli (placing in a utensil)",
+      "example_context": "Number two, there was Matan Ba'keli, the placing in a utensil. The Kohen takes the komets, and he places it in a second Kleh Sharet,",
+      "updated_at": "2026-03-15T21:08:02.940538Z"
+    },
+    {
+      "raw_text": "Kabbalat Adam",
+      "replacement": "Kabbalat Adam (acceptance or catching of blood after Shehita)",
+      "example_context": "which is like the Kabbalat Adam, the acceptance or the catching of the blood after the Shehita.",
+      "updated_at": "2026-03-15T21:08:02.940538Z"
+    },
+    {
+      "raw_text": "Holakha",
+      "replacement": "Holakha (walking of animal's blood to Mizbayah)",
+      "example_context": "Number three, there's the Holakha. The Kohen takes that komets to the Mizbayah,",
+      "updated_at": "2026-03-15T21:08:02.940538Z"
+    },
+    {
+      "raw_text": "Haqtara",
+      "replacement": "Haqtara (burning of komets on Mizbayah)",
+      "example_context": "and lastly there's the Haqtara, the burning of the komets of the Minha on the Mizbayah,",
+      "updated_at": "2026-03-15T21:08:02.940538Z"
+    },
+    {
+      "raw_text": "Kiddushat Damim",
+      "replacement": "Kiddushat Damim (consecration of flour and oil)",
+      "example_context": "They take on the Kiddushat Damim, and therefore Ma'ila is in play.",
+      "updated_at": "2026-03-15T21:08:02.940538Z"
+    },
+    {
+      "raw_text": "Ma'ila",
+      "replacement": "Ma'ila (dedication of flour and oil for Korban Minha)",
+      "example_context": "Mishnah says, the Minha offerings are connected to the Avodah of Ma'ila from when a person dedicates the flour and oil by saying the flour and oil are consecrated for a Korban Minha.",
+      "updated_at": "2026-03-15T21:08:02.940538Z"
+    },
+    {
+      "raw_text": "Karat",
+      "replacement": "Karat (transgressions of pigul, motad, or tamayah)",
+      "example_context": "Karab HaKomets, after the komets is offered on the Mizbayah, can become liable for Karat for the transgressions of pigul, motad, or tamayah",
+      "updated_at": "2026-03-15T21:08:02.940538Z"
+    },
+    {
+      "raw_text": "pigul",
+      "replacement": "pigul (eating Minha after komets was offered)",
+      "example_context": "If someone eats a Minha after the komets was offered, then improperly, then a person becomes, he violated pigul.",
+      "updated_at": "2026-03-15T21:08:02.940538Z"
+    },
+    {
+      "raw_text": "motad",
+      "replacement": "motad (eating from remainder past proper time)",
+      "example_context": "If after the komets was offered on the Mizbayah, a person also ate from the remainder past the proper time, that it was allowed, he would also be in violation of motad,",
+      "updated_at": "2026-03-15T21:08:02.940538Z"
+    },
+    {
+      "raw_text": "tamayah",
+      "replacement": "tamayah (eating from remainder while tamayah)",
+      "example_context": "and if after the komets was offered on the Mizbayah, a person was tamayah, and he ate from the remainder, he would also be in violation,",
+      "updated_at": "2026-03-15T21:08:02.940538Z"
+    },
+    {
+      "raw_text": "me'ila",
+      "replacement": "me'ila (dedication of flour and oil for Korban Minha)",
+      "example_context": "The inmu'alim bashirayim, after the komets was offered, whatever is left over is not connected to me'ila,",
+      "updated_at": "2026-03-15T21:08:02.940538Z"
+    },
+    {
+      "raw_text": "kochi ha'zim",
+      "replacement": "kochi ha'zim (property of Hashem)",
+      "example_context": "and it is no longer subject to me'ila, but the komets that was offered on the Mizbayah, that's entirely burned on the Mizbayah, me'ila still applies,",
+      "updated_at": "2026-03-15T21:08:02.940538Z"
+    },
+    {
+      "raw_text": "hava'a",
+      "replacement": "hava'a (taking of ashes to betadashim)",
+      "example_context": "any mitzvah connected to the ashes, which is the hava'a, the taking of the ashes to the betadashim is fully completed,",
+      "updated_at": "2026-03-15T21:08:02.940538Z"
+    }
+  ]
+}
