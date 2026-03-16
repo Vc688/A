@@ -30,7 +30,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 BACKEND_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = BACKEND_DIR.parent
-LEGACY_APP_PATH = PROJECT_ROOT / "app.py"
+LEGACY_APP_PATH = BACKEND_DIR / "legacy_reference_app.py"
 legacy_spec = importlib.util.spec_from_file_location("legacy_reference_app", LEGACY_APP_PATH)
 legacy_app = importlib.util.module_from_spec(legacy_spec)
 assert legacy_spec and legacy_spec.loader
@@ -328,15 +328,32 @@ def init_db() -> None:
 
 
 def ensure_admin() -> None:
+    default_email = "admin@torahcenter.app"
+    default_password = "ChangeMe123!"
     conn = db()
     try:
-        row = conn.execute("SELECT id FROM users WHERE email = ?", (ADMIN_EMAIL,)).fetchone()
-        if row:
-            return
-        conn.execute(
-            "INSERT INTO users (id, email, password_hash, created_at) VALUES (?, ?, ?, ?)",
-            (uuid.uuid4().hex, ADMIN_EMAIL, generate_password_hash(ADMIN_PASSWORD), now_iso()),
-        )
+        configured = conn.execute("SELECT id, email, password_hash FROM users WHERE email = ?", (ADMIN_EMAIL,)).fetchone()
+        default_row = None
+        if ADMIN_EMAIL != default_email:
+            default_row = conn.execute("SELECT id, email, password_hash FROM users WHERE email = ?", (default_email,)).fetchone()
+
+        password_hash = generate_password_hash(ADMIN_PASSWORD)
+        if configured:
+            conn.execute(
+                "UPDATE users SET password_hash = ?, role = 'admin' WHERE id = ?",
+                (password_hash, configured["id"]),
+            )
+        elif default_row and default_row.get("password_hash") and check_password_hash(default_row["password_hash"], default_password):
+            # Migrate the untouched bootstrap admin account to the configured credentials.
+            conn.execute(
+                "UPDATE users SET email = ?, password_hash = ?, role = 'admin' WHERE id = ?",
+                (ADMIN_EMAIL, password_hash, default_row["id"]),
+            )
+        else:
+            conn.execute(
+                "INSERT INTO users (id, email, password_hash, role, created_at) VALUES (?, ?, ?, ?, ?)",
+                (uuid.uuid4().hex, ADMIN_EMAIL, password_hash, "admin", now_iso()),
+            )
         conn.commit()
     finally:
         conn.close()
