@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ product_name }} | Article Studio</title>
+  <style>
+    :root { --bg:#f6f1e8; --card:#fffdf8; --line:#dccdb8; --ink:#1f2933; --muted:#66717c; --accent:#8d6034; --success:#2f6b50; --danger:#9f1239; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:Georgia, "Times New Roman", serif; color:var(--ink); background:linear-gradient(180deg,#f8f4ec 0%,var(--bg) 100%); }
+    .shell { max-width:1280px; margin:0 auto; padding:1rem; }
+    .topbar, .section-header, .actions, .tabs { display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; }
+    .topbar { justify-content:space-between; margin-bottom:1rem; }
+    .brand h1 { margin:0; color:#5c3c21; }
+    .brand p, .helper { color:var(--muted); }
+    .tabs { margin-bottom:1rem; }
+    .tab-button, .button, .download-link, .topbar button { border:none; border-radius:999px; padding:.72rem 1rem; font:inherit; font-weight:700; cursor:pointer; text-decoration:none; }
+    .tab-button, .button.ghost { background:white; border:1px solid var(--line); color:#5b4330; }
+    .tab-button.active, .button, .topbar button { background:var(--accent); color:white; }
+    .button.secondary { background:#6b7280; color:white; }
+    .button.danger { background:var(--danger); color:white; }
+    .download-link { background:var(--success); color:white; }
+    .message { display:none; padding:.9rem 1rem; border-radius:12px; margin-bottom:1rem; }
+    .message.success, .message.error { display:block; }
+    .message.success { background:#edf8f1; color:#166534; border:1px solid #bad9c6; }
+    .message.error { background:#fff2f5; color:var(--danger); border:1px solid #f5c2cd; }
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
+    .grid { display:grid; gap:1rem; }
+    .generation { grid-template-columns:minmax(310px,390px) minmax(0,1fr); }
+    .tools-grid { grid-template-columns:minmax(280px,420px) minmax(0,1fr); }
+    .history-grid { grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:1rem; }
+    .field { margin-bottom:.9rem; }
+    .field label { display:block; font-weight:700; margin-bottom:.35rem; }
+    .field input, .field textarea, .field select { width:100%; border:1px solid var(--line); border-radius:12px; padding:.75rem .8rem; font:inherit; }
+    .field textarea { min-height:120px; resize:vertical; }
+    .compact { display:grid; gap:.75rem; grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .triple { display:grid; gap:.75rem; grid-template-columns:repeat(3,minmax(0,1fr)); }
+    .status-card { background:#faf5ea; border:1px solid var(--line); border-radius:14px; padding:1rem; }
+    .progress-shell { height:14px; background:#e7dccb; border-radius:999px; overflow:hidden; margin:.75rem 0 .5rem; }
+    .progress-bar { height:100%; width:0%; background:linear-gradient(90deg,#8a5a2f 0%,#c28d51 100%); }
+    .job-card { border:1px solid var(--line); border-radius:14px; padding:1rem; background:#fcf8f0; display:grid; gap:.65rem; }
+    .job-card.active { border-color:var(--accent); }
+    .chip { display:inline-flex; width:max-content; padding:.35rem .6rem; border-radius:999px; background:#ead8c3; color:#6b4b2a; font-size:.86rem; font-weight:700; }
+    .preview-shell { border:1px solid var(--line); border-radius:14px; overflow:hidden; background:white; }
+    .preview-frame { width:100%; height:640px; border:0; background:white; }
+    .hidden { display:none !important; }
+    pre.transcript { margin:0; min-height:220px; white-space:pre-wrap; word-wrap:break-word; border:1px solid var(--line); border-radius:12px; padding:1rem; background:#fbf8ef; }
+    @media (max-width:980px) { .generation, .tools-grid, .compact, .triple { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="topbar">
+      <div class="brand">
+        <h1>{{ product_name }}</h1>
+        <p>Torah Center article studio for transcript review, translation rules, article editing, and exports.</p>
+      </div>
+      <div>
+        <p class="helper">Signed in as {{ user.email }}</p>
+        {% if clerk_enabled %}
+        <button id="clerk-signout-button" type="button">Log Out</button>
+        {% else %}
+        <form action="/logout" method="post"><button type="submit">Log Out</button></form>
+        {% endif %}
+      </div>
+    </div>
+    <div id="message-box" class="message"></div>
+    <div class="tabs">
+      <button class="tab-button active" data-tab="generation">Article Generation</button>
+      <button class="tab-button" data-tab="history">History</button>
+      <button class="tab-button" data-tab="tools">Other Tools</button>
+    </div>
+
+    <section id="tab-generation" class="tab-panel active">
+      <div class="grid generation">
+        <div class="grid">
+          <section class="card">
+            <div class="section-header"><h2 style="margin:0;">Create Article</h2><button id="next-project-button" class="tab-button" type="button">Next Project</button></div>
+            <form id="create-form" enctype="multipart/form-data">
+              <div class="compact">
+                <div class="field"><label for="rabbi-name">Speaker / Rabbi</label><input id="rabbi-name" name="rabbi_name" type="text" required /></div>
+                <div class="field"><label for="topic">Article Title</label><input id="topic" name="topic" type="text" required /></div>
+              </div>
+              <div class="field"><label for="transliteration-mode">Translation Rules</label><select id="transliteration-mode" name="transliteration_mode"><option value="auto">Automatic transliteration</option><option value="manual-review-heavy">Manual review of complex Hebrew phrases</option><option value="hebrew">Hebrew itself</option></select></div>
+              <div id="audio-dropzone" class="field card" style="background:#fbf8ef; box-shadow:none;"><label for="audio">Upload Audio or Video</label><input id="audio" name="audio" type="file" accept=".mp3,.mp4,audio/mpeg,video/mp4" /><p class="helper">Drop `.mp3` or `.mp4` files here, or click to choose them.</p></div>
+              <div class="actions"><button class="button" type="submit">Create Article</button><button id="cancel-project-button" class="button secondary hidden" type="button">Cancel Project</button></div>
+            </form>
+          </section>
+          <section class="card">
+            <h2 style="margin-top:0;">Progress</h2>
+            <div class="status-card"><p id="status-line" style="margin:0;font-weight:700;">Ready</p><div class="progress-shell"><div id="progress-bar" class="progress-bar"></div></div><p id="status-meta" class="helper">0%</p></div>
+            <div id="review-card" class="hidden" style="margin-top:1rem;"><h3>Hebrew Clarification</h3><form id="review-form"><div id="review-items"></div><div class="actions"><button class="button" type="submit">Continue to Article</button></div></form></div>
+          </section>
+          <section id="billing-card" class="card hidden">
+            <h2 style="margin-top:0;">Unlock Access</h2>
+            <p id="billing-status" class="helper">Completed articles stay hidden until payment or an active subscription unlocks them.</p>
+            <div class="actions">
+              <button id="unlock-job-button" class="button" type="button">Unlock This Article - $5</button>
+              <button id="subscribe-button" class="button secondary" type="button">Go Unlimited - $15/month</button>
+            </div>
+          </section>
+          <section class="card"><h2 style="margin-top:0;">Generated Transcript</h2><pre id="transcript-output" class="transcript">No transcript yet.</pre></section>
+        </div>
+        <div class="grid">
+          <section class="card">
+            <div class="section-header"><div><h2 style="margin:0;">Article Editor</h2><p class="helper">Edit article text and PDF design here.</p></div><button id="delete-project-button" class="button danger hidden" type="button">Delete Project</button></div>
+            <div id="editor-empty">Generate or open a project from History to start editing.</div>
+            <div id="locked-editor-message" class="card hidden" style="background:#fbf8ef; box-shadow:none;">
+              <strong>This completed article is locked.</strong>
+              <p class="helper" style="margin-bottom:0;">Pay the one-time unlock or start the monthly plan to reveal the transcript, article text, preview, and export tools.</p>
+            </div>
+            <div id="editor-shell" class="hidden">
+              <div class="compact">
+                <div class="field"><label for="editor-title">Article Title</label><input id="editor-title" type="text" /></div>
+                <div class="field"><label for="editor-rabbi">Speaker / Rabbi</label><input id="editor-rabbi" type="text" disabled /></div>
+              </div>
+              <div class="field"><label for="editor-text">Article Text</label><textarea id="editor-text" style="min-height:360px;"></textarea></div>
+              <div class="card" style="background:#fbf8ef; box-shadow:none;">
+                <h3 style="margin-top:0;">PDF Design</h3>
+                <div class="compact">
+                  <div class="field"><label for="pdf-header-left">Top Left Text</label><input id="pdf-header-left" type="text" /></div>
+                  <div class="field"><label for="pdf-header-right">Top Right Text</label><input id="pdf-header-right" type="text" /></div>
+                </div>
+                <div class="field"><label for="pdf-footer-text">Bottom Text</label><input id="pdf-footer-text" type="text" /></div>
+                <div class="triple">
+                  <div class="field"><label for="pdf-line-spacing">Body Line Spacing</label><input id="pdf-line-spacing" type="number" min="0.5" max="3.0" step="0.05" /></div>
+                  <div class="field"><label for="pdf-font-size">Body Font Size</label><input id="pdf-font-size" type="number" min="0.1" max="36" step="0.5" value="12" /></div>
+                  <div class="field"><label for="pdf-body-align">Body Alignment</label><select id="pdf-body-align"><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option><option value="justify">Justify</option></select></div>
+                </div>
+                <div class="triple">
+                  <div class="field"><label for="pdf-background-mode">Background</label><select id="pdf-background-mode"><option value="default">Default</option><option value="blank">Blank</option><option value="custom">Custom Upload</option></select></div>
+                  <div class="field"></div>
+                  <div class="field"></div>
+                </div>
+                <div class="triple">
+                  <div class="field"><label for="pdf-header-left-size">Top Left Size</label><input id="pdf-header-left-size" type="number" min="8" max="30" step="0.5" /></div>
+                  <div class="field"><label for="pdf-header-right-size">Top Right Size</label><input id="pdf-header-right-size" type="number" min="8" max="30" step="0.5" /></div>
+                  <div class="field"><label for="pdf-footer-size">Bottom Size</label><input id="pdf-footer-size" type="number" min="8" max="24" step="0.5" /></div>
+                </div>
+                <div class="triple">
+                  <div class="field"><label for="pdf-header-left-align">Top Left Align</label><select id="pdf-header-left-align"><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option></select></div>
+                  <div class="field"><label for="pdf-header-right-align">Top Right Align</label><select id="pdf-header-right-align"><option value="right">Right</option><option value="center">Center</option><option value="left">Left</option></select></div>
+                  <div class="field"><label for="pdf-footer-align">Bottom Align</label><select id="pdf-footer-align"><option value="center">Center</option><option value="left">Left</option><option value="right">Right</option></select></div>
+                </div>
+                <div class="triple">
+                  <div class="field"><label for="pdf-header-y">Top Text Y Position</label><input id="pdf-header-y" type="number" min="690" max="760" step="1" /></div>
+                  <div class="field"><label for="pdf-footer-y">Bottom Text Y Position</label><input id="pdf-footer-y" type="number" min="18" max="80" step="1" /></div>
+                  <div id="background-field" class="field hidden"><label for="background-file">Custom Background</label><input id="background-file" type="file" accept=".png,.jpg,.jpeg" /></div>
+                </div>
+              </div>
+              <div class="actions" style="margin-top:1rem;"><button id="save-button" class="button" type="button">Save Changes</button><button id="preview-pdf-button" class="button secondary" type="button">Preview PDF</button><a id="download-pdf" class="download-link" href="#">Download PDF</a><a id="download-png" class="download-link" href="#">Download PNG</a><a id="download-docx" class="download-link" href="#">Download DOCX</a><span id="save-status" class="helper"></span></div>
+              <div id="pdf-preview-card" class="card hidden" style="margin-top:1rem; background:#fbf8ef; box-shadow:none;">
+                <div class="section-header">
+                  <div>
+                    <h3 style="margin:0;">PDF Preview</h3>
+                    <p class="helper" style="margin:.35rem 0 0;">Refreshes from your latest saved settings.</p>
+                  </div>
+                  <button id="close-preview-button" class="button ghost" type="button">Hide Preview</button>
+                </div>
+                <div class="preview-shell">
+                  <iframe id="pdf-preview-frame" class="preview-frame" title="PDF Preview"></iframe>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-history" class="tab-panel"><div class="card"><div class="section-header"><div><h2 style="margin:0;">History</h2><p class="helper">Open past articles back into the generation workspace.</p></div><button id="refresh-jobs" class="button" type="button">Refresh History</button></div><div id="history-list" class="grid history-grid"></div></div></section>
+
+    <section id="tab-tools" class="tab-panel"><div class="grid tools-grid"><section class="card"><div class="section-header"><div><h2 style="margin:0;">Hebrew Terms Library</h2><p class="helper">This library feeds transcription, transliteration, Hebrew rendering, and article normalization.</p></div><button id="save-library" class="button" type="button">Save Library</button></div><div class="field"><label for="library-json">Library JSON</label><textarea id="library-json" style="min-height:420px;" spellcheck="false"></textarea></div></section><section class="grid"><section class="card"><h2 style="margin-top:0;">Quick Inputs</h2><p class="helper">Use one of these instead of audio when you want a faster testing loop.</p><div class="field"><label for="tools-transcript-text">Paste Transcript</label><textarea id="tools-transcript-text"></textarea></div><div class="field"><label for="tools-article-text">Paste Finished Article</label><textarea id="tools-article-text"></textarea></div></section><section class="card"><h2 style="margin-top:0;">Download Tools</h2><p id="tools-selected-job" class="helper">Choose a project from History or Article Generation to enable these downloaders.</p><div class="actions"><a id="download-transcript-text" class="download-link hidden" href="#">Download Transcript TXT</a><a id="download-article-text" class="download-link hidden" href="#">Download Article TXT</a><a id="tools-download-pdf" class="download-link hidden" href="#">Download PDF</a><a id="tools-download-png" class="download-link hidden" href="#">Download PNG</a><a id="tools-download-docx" class="download-link hidden" href="#">Download DOCX</a></div><div class="card" style="margin-top:1rem; background:#fbf8ef; box-shadow:none;"><h3 style="margin-top:0;">Hosted Product Direction</h3><p class="helper">This browser app is the web-first baseline for a hosted Torah Center product with shared history and a monthly subscription direction later.</p></div></section></section></div></section>
+  </main>
+
+  <script>
+    const clerkEnabled = {{ "true" if clerk_enabled else "false" }};
+    const clerkPublishableKey = {{ clerk_publishable_key|tojson }};
+    const clerkFrontendApiUrl = {{ clerk_frontend_api_url|tojson }};
+    const clerkAfterSignInUrl = {{ clerk_after_sign_in_url|tojson }};
+    const clerkAfterSignUpUrl = {{ clerk_after_sign_up_url|tojson }};
+    const stripeEnabled = {{ "true" if stripe_enabled else "false" }};
+    const initialJobs = {{ jobs|tojson }};
+    const initialSelectedJob = {{ selected_job|tojson }};
+    const messageBox = document.getElementById("message-box");
+    const tabButtons = [...document.querySelectorAll(".tab-button")];
+    const tabPanels = [...document.querySelectorAll(".tab-panel")];
+    const createForm = document.getElementById("create-form");
+    const audioDropzone = document.getElementById("audio-dropzone");
+    const audioInput = document.getElementById("audio");
+    const transliterationMode = document.getElementById("transliteration-mode");
+    const toolsTranscriptText = document.getElementById("tools-transcript-text");
+    const toolsArticleText = document.getElementById("tools-article-text");
+    const nextProjectButton = document.getElementById("next-project-button");
+    const cancelProjectButton = document.getElementById("cancel-project-button");
+    const deleteProjectButton = document.getElementById("delete-project-button");
+    const refreshJobsButton = document.getElementById("refresh-jobs");
+    const statusLine = document.getElementById("status-line");
+    const statusMeta = document.getElementById("status-meta");
+    const progressBar = document.getElementById("progress-bar");
+    const reviewCard = document.getElementById("review-card");
+    const billingCard = document.getElementById("billing-card");
+    const billingStatus = document.getElementById("billing-status");
+    const unlockJobButton = document.getElementById("unlock-job-button");
+    const subscribeButton = document.getElementById("subscribe-button");
+    const reviewForm = document.getElementById("review-form");
+    const reviewItems = document.getElementById("review-items");
+    const transcriptOutput = document.getElementById("transcript-output");
+    const editorEmpty = document.getElementById("editor-empty");
+    const lockedEditorMessage = document.getElementById("locked-editor-message");
+    const editorShell = document.getElementById("editor-shell");
+    const editorTitle = document.getElementById("editor-title");
+    const editorRabbi = document.getElementById("editor-rabbi");
+    const editorText = document.getElementById("editor-text");
+    const saveButton = document.getElementById("save-button");
+    const saveStatus = document.getElementById("save-status");
+    const previewPdfButton = document.getElementById("preview-pdf-button");
+    const closePreviewButton = document.getElementById("close-preview-button");
+    const pdfPreviewCard = document.getElementById("pdf-preview-card");
+    const pdfPreviewFrame = document.getElementById("pdf-preview-frame");
+    const pdfLineSpacing = document.getElementById("pdf-line-spacing");
+    const pdfFontSize = document.getElementById("pdf-font-size");
+    const pdfBodyAlign = document.getElementById("pdf-body-align");
+    const pdfBackgroundMode = document.getElementById("pdf-background-mode");
+    const pdfHeaderLeft = document.getElementById("pdf-header-left");
+    const pdfHeaderRight = document.getElementById("pdf-header-right");
+    const pdfFooterText = document.getElementById("pdf-footer-text");
+    const pdfHeaderLeftSize = document.getElementById("pdf-header-left-size");
+    const pdfHeaderRightSize = document.getElementById("pdf-header-right-size");
+    const pdfFooterSize = document.getElementById("pdf-footer-size");
+    const pdfHeaderLeftAlign = document.getElementById("pdf-header-left-align");
+    const pdfHeaderRightAlign = document.getElementById("pdf-header-right-align");
+    const pdfFooterAlign = document.getElementById("pdf-footer-align");
+    const pdfHeaderY = document.getElementById("pdf-header-y");
+    const pdfFooterY = document.getElementById("pdf-footer-y");
+    const backgroundField = document.getElementById("background-field");
+    const backgroundFile = document.getElementById("background-file");
+    const historyList = document.getElementById("history-list");
+    const libraryJson = document.getElementById("library-json");
+    const saveLibraryButton = document.getElementById("save-library");
+    const toolsSelectedJob = document.getElementById("tools-selected-job");
+    const downloadPdf = document.getElementById("download-pdf");
+    const downloadPng = document.getElementById("download-png");
+    const downloadDocx = document.getElementById("download-docx");
+    const toolsDownloadPdf = document.getElementById("tools-download-pdf");
+    const toolsDownloadPng = document.getElementById("tools-download-png");
+    const toolsDownloadDocx = document.getElementById("tools-download-docx");
+    const downloadTranscriptText = document.getElementById("download-transcript-text");
+    const downloadArticleText = document.getElementById("download-article-text");
+    const clerkSignoutButton = document.getElementById("clerk-signout-button");
+    let jobs = initialJobs || [];
+    let activeJobId = initialSelectedJob && initialSelectedJob.id ? initialSelectedJob.id : null;
+    let currentJob = initialSelectedJob || null;
+    let dirty = false;
+    let hasCustomBackground = Boolean(initialSelectedJob && initialSelectedJob.pdf_custom_background);
+    let saveInFlight = false;
+    let downloadInFlight = false;
+    let editorHydratedJobId = initialSelectedJob && initialSelectedJob.id ? initialSelectedJob.id : null;
+    function setMessage(text, kind = "success") { if (!text) { messageBox.className = "message"; messageBox.textContent = ""; return; } messageBox.className = `message ${kind}`; messageBox.textContent = text; }
+    function switchTab(tabName) { tabButtons.forEach((button) => button.classList.toggle("active", button.dataset.tab === tabName)); tabPanels.forEach((panel) => panel.classList.toggle("active", panel.id === `tab-${tabName}`)); }
+    function setProgress(progress, message) { statusLine.textContent = message || "Ready"; statusMeta.textContent = `${progress || 0}%`; progressBar.style.width = `${progress || 0}%`; }
+    function markDirty() { if (!editorShell.classList.contains("hidden")) { dirty = true; saveStatus.textContent = "Unsaved changes."; } }
+    function updateBackgroundField() { const show = pdfBackgroundMode.value === "custom"; backgroundField.classList.toggle("hidden", !show); if (!show) { backgroundFile.value = ""; } }
+    function resetWorkspace() { activeJobId = null; currentJob = null; dirty = false; hasCustomBackground = false; editorHydratedJobId = null; createForm.reset(); setProgress(0, "Ready"); transcriptOutput.textContent = "No transcript yet."; reviewCard.classList.add("hidden"); billingCard.classList.add("hidden"); editorEmpty.classList.remove("hidden"); lockedEditorMessage.classList.add("hidden"); editorShell.classList.add("hidden"); cancelProjectButton.classList.add("hidden"); deleteProjectButton.classList.add("hidden"); saveStatus.textContent = ""; pdfPreviewCard.classList.add("hidden"); pdfPreviewFrame.removeAttribute("src"); toolsSelectedJob.textContent = "Choose a project from History or Article Generation to enable these downloaders."; [downloadTranscriptText, downloadArticleText, toolsDownloadPdf, toolsDownloadPng, toolsDownloadDocx].forEach((link) => link.classList.add("hidden")); setMessage(""); renderHistory(); }
+    async function fetchJson(url, options = {}) { const response = await fetch(url, options); const contentType = response.headers.get("content-type") || ""; const data = contentType.includes("application/json") ? await response.json() : await response.text(); if (!response.ok) throw new Error(typeof data === "string" ? data : (data.error || "Request failed.")); return data; }
+    function renderHistory() { historyList.innerHTML = ""; if (!jobs.length) { historyList.innerHTML = '<p class="helper">No projects yet.</p>'; return; } jobs.forEach((job) => { const card = document.createElement("div"); card.className = `job-card${job.id === activeJobId ? " active" : ""}`; const isCancelable = ["queued", "running", "needs_review"].includes(job.status); card.innerHTML = `<div class="chip">${job.status}</div><strong>${job.topic}</strong><div class="helper">${job.rabbi_name}</div><div class="actions"><button class="button ghost open-job" type="button">Open</button><button class="button secondary cancel-job" type="button" ${isCancelable ? "" : "disabled"}>Cancel</button><button class="button danger delete-job" type="button">Delete</button></div>`; card.querySelector(".open-job").addEventListener("click", () => { loadJob(job.id).then(() => switchTab("generation")).catch((error) => setMessage(error.message, "error")); }); card.querySelector(".cancel-job").addEventListener("click", async () => { try { await fetchJson(`/api/jobs/${job.id}/cancel`, { method: "POST" }); setMessage("Project canceled."); await refreshJobs(); if (job.id === activeJobId) await loadJob(job.id); } catch (error) { setMessage(error.message, "error"); } }); card.querySelector(".delete-job").addEventListener("click", async () => { try { await fetchJson(`/api/jobs/${job.id}`, { method: "DELETE" }); if (job.id === activeJobId) resetWorkspace(); setMessage("Project deleted."); await refreshJobs(); } catch (error) { setMessage(error.message, "error"); } }); historyList.appendChild(card); }); }
+    function renderReview(items) { reviewItems.innerHTML = ""; items.forEach((item) => { const suggestion = item.clarification || (item.suggestions && item.suggestions[0]) || ""; const wrapper = document.createElement("div"); wrapper.className = "card"; wrapper.style.marginTop = ".75rem"; wrapper.innerHTML = `<p><strong>${item.raw_text}</strong></p><p class="helper">${item.context || ""}</p><div class="field"><label for="${item.id}">Clarification</label><input id="${item.id}" name="${item.id}" type="text" value="${suggestion}" placeholder="Transliteration + English" /></div>`; reviewItems.appendChild(wrapper); }); }
+    function bindDownloadLinks(job) { const base = `/api/jobs/${job.id}`; downloadPdf.href = `${base}/pdf`; downloadPng.href = `${base}/png`; downloadDocx.href = `${base}/docx`; toolsDownloadPdf.href = `${base}/pdf`; toolsDownloadPng.href = `${base}/png`; toolsDownloadDocx.href = `${base}/docx`; downloadTranscriptText.href = `${base}/transcript.txt`; downloadArticleText.href = `${base}/article.txt`; const links = [downloadPdf, downloadPng, downloadDocx, downloadTranscriptText, downloadArticleText, toolsDownloadPdf, toolsDownloadPng, toolsDownloadDocx]; links.forEach((link) => link.classList.toggle("hidden", Boolean(job.access_locked))); toolsSelectedJob.textContent = `Selected project: ${job.topic} by ${job.rabbi_name}`; }
+    async function refreshPdfPreview() { if (!activeJobId) throw new Error("No project is selected."); if (dirty) await saveChanges(); const response = await fetch(`/api/jobs/${activeJobId}/pdf/preview?ts=${Date.now()}`); if (!response.ok) { const contentType = response.headers.get("content-type") || ""; const data = contentType.includes("application/json") ? await response.json() : await response.text(); throw new Error(typeof data === "string" ? data : (data.error || "Preview failed.")); } const blob = await response.blob(); const objectUrl = URL.createObjectURL(blob); pdfPreviewCard.classList.remove("hidden"); pdfPreviewFrame.src = objectUrl; }
+    function hydrateEditor(job) { editorTitle.value = job.topic || ""; editorRabbi.value = job.rabbi_name || ""; editorText.value = job.edited_one_pager || job.one_pager || ""; transliterationMode.value = job.transliteration_mode || "auto"; pdfLineSpacing.value = String(job.pdf_line_spacing || 1.0); pdfFontSize.value = String(job.pdf_font_size || 12); if (!pdfFontSize.value || Number(pdfFontSize.value) <= 0) pdfFontSize.value = "12"; pdfBodyAlign.value = job.pdf_body_align || "left"; pdfBackgroundMode.value = job.pdf_background_mode || "default"; pdfHeaderLeft.value = job.pdf_header_left || "Torah Center"; pdfHeaderRight.value = job.pdf_header_right || "Torah from our Rabbis"; pdfFooterText.value = job.pdf_footer_text || "Torah Center"; pdfHeaderLeftSize.value = job.pdf_header_left_size || 15; pdfHeaderRightSize.value = job.pdf_header_right_size || 14; pdfFooterSize.value = job.pdf_footer_size || 10; pdfHeaderLeftAlign.value = job.pdf_header_left_align || "left"; pdfHeaderRightAlign.value = job.pdf_header_right_align || "right"; pdfFooterAlign.value = job.pdf_footer_align || "center"; pdfHeaderY.value = job.pdf_header_y || 738; pdfFooterY.value = job.pdf_footer_y || 30; hasCustomBackground = Boolean(job.pdf_custom_background); updateBackgroundField(); editorHydratedJobId = job.id; }
+    function renderJob(job, options = {}) { const forceEditor = Boolean(options.forceEditor); currentJob = job; activeJobId = job.id; cancelProjectButton.classList.toggle("hidden", !["queued", "running", "needs_review"].includes(job.status)); deleteProjectButton.classList.remove("hidden"); setProgress(job.progress || 0, job.message || "Working..."); transcriptOutput.textContent = job.access_locked ? "Completed article is locked until payment or subscription." : (job.final_transcript || job.raw_transcript || "No transcript yet."); if (job.status === "needs_review") { reviewCard.classList.remove("hidden"); renderReview(job.review_items || []); } else { reviewCard.classList.add("hidden"); } billingCard.classList.toggle("hidden", !(job.access_locked && job.status === "completed")); billingStatus.textContent = job.access_locked ? `Unlock this completed article for $${((job.single_unlock_price_cents || 500) / 100).toFixed(2)} or subscribe for $${((job.monthly_price_cents || 1500) / 100).toFixed(2)}/month.` : "Completed articles stay hidden until payment or an active subscription unlocks them."; editorEmpty.classList.add("hidden"); lockedEditorMessage.classList.toggle("hidden", !job.access_locked); editorShell.classList.toggle("hidden", Boolean(job.access_locked)); if (!job.access_locked && (forceEditor || editorHydratedJobId !== job.id || !dirty)) { hydrateEditor(job); if (forceEditor) { dirty = false; saveStatus.textContent = ""; } } bindDownloadLinks(job); saveButton.disabled = false; saveButton.textContent = "Save Changes"; if (job.status === "failed" && job.error) setMessage(job.error, "error"); else if (job.status === "canceled") setMessage("Project canceled.", "success"); renderHistory(); }
+    async function refreshJobs() { const data = await fetchJson("/api/jobs"); jobs = data.jobs || []; renderHistory(); return jobs; }
+    async function loadJob(jobId, options = {}) { const job = await fetchJson(`/api/jobs/${jobId}`); renderJob(job, { forceEditor: options.forceEditor !== false }); if (["queued", "running"].includes(job.status)) pollJob(job.id); }
+    async function pollJob(jobId) { activeJobId = jobId; while (activeJobId === jobId) { const job = await fetchJson(`/api/jobs/${jobId}`); renderJob(job, { forceEditor: false }); if (!["queued", "running"].includes(job.status)) return; await new Promise((resolve) => setTimeout(resolve, 2000)); } }
+    async function uploadBackgroundIfNeeded() { if (pdfBackgroundMode.value !== "custom") return; if (backgroundFile.files.length) { const formData = new FormData(); formData.append("background", backgroundFile.files[0]); await fetchJson(`/api/jobs/${activeJobId}/background`, { method: "POST", body: formData }); hasCustomBackground = true; backgroundFile.value = ""; } else if (!hasCustomBackground) { throw new Error("Choose a custom background before saving or downloading."); } }
+    async function saveChanges() { if (!activeJobId) throw new Error("No project is selected."); if (saveInFlight) return; saveInFlight = true; saveButton.disabled = true; saveButton.textContent = "Saving..."; saveStatus.textContent = "Saving changes..."; try { const requestedFontSize = Number(String(pdfFontSize.value || 12).replace(",", ".")); const requestedLineSpacing = Number(String(pdfLineSpacing.value || 1).replace(",", ".")); const normalizedFontSize = String(requestedFontSize > 0 ? requestedFontSize : 12); const normalizedLineSpacing = String(requestedLineSpacing > 0 ? requestedLineSpacing : 1); pdfFontSize.value = normalizedFontSize; pdfLineSpacing.value = normalizedLineSpacing; await uploadBackgroundIfNeeded(); await fetchJson(`/api/jobs/${activeJobId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ topic: editorTitle.value.trim(), edited_one_pager: editorText.value.trim(), transliteration_mode: transliterationMode.value, pdf_line_spacing: normalizedLineSpacing, pdf_font_size: normalizedFontSize, pdf_body_align: pdfBodyAlign.value, pdf_background_mode: pdfBackgroundMode.value, pdf_header_left: pdfHeaderLeft.value.trim(), pdf_header_right: pdfHeaderRight.value.trim(), pdf_footer_text: pdfFooterText.value.trim(), pdf_header_left_size: pdfHeaderLeftSize.value, pdf_header_right_size: pdfHeaderRightSize.value, pdf_footer_size: pdfFooterSize.value, pdf_header_left_align: pdfHeaderLeftAlign.value, pdf_header_right_align: pdfHeaderRightAlign.value, pdf_footer_align: pdfFooterAlign.value, pdf_header_y: pdfHeaderY.value, pdf_footer_y: pdfFooterY.value }) }); dirty = false; saveStatus.textContent = "Changes saved."; setMessage("Changes saved."); await loadJob(activeJobId, { forceEditor: true }); } finally { saveInFlight = false; saveButton.disabled = false; saveButton.textContent = "Save Changes"; } }
+    async function downloadWithServerName(url, fallbackName) { if (downloadInFlight) return; downloadInFlight = true; try { if (dirty) await saveChanges(); const response = await fetch(url); if (!response.ok) { const contentType = response.headers.get("content-type") || ""; const data = contentType.includes("application/json") ? await response.json() : await response.text(); throw new Error(typeof data === "string" ? data : (data.error || "Download failed.")); } const blob = await response.blob(); const objectUrl = URL.createObjectURL(blob); const disposition = response.headers.get("content-disposition") || ""; const utfMatch = disposition.match(/filename\\*=UTF-8''([^;]+)/i); const match = disposition.match(/filename="?([^";]+)"?/i); const suggestedName = utfMatch ? decodeURIComponent(utfMatch[1]) : (match ? match[1] : fallbackName); const anchor = document.createElement("a"); anchor.href = objectUrl; anchor.download = suggestedName; document.body.appendChild(anchor); anchor.click(); anchor.remove(); setTimeout(() => URL.revokeObjectURL(objectUrl), 1000); } finally { downloadInFlight = false; } }
+    async function downloadArtifact(kind) { if (!activeJobId) throw new Error("Open a project before downloading."); const path = kind === "transcript" ? "transcript.txt" : kind === "article" ? "article.txt" : kind; const fallback = kind === "pdf" ? "article.pdf" : kind === "png" ? "article.png" : kind === "docx" ? "article.docx" : kind === "transcript" ? "transcript.txt" : "article.txt"; await downloadWithServerName(`/api/jobs/${activeJobId}/${path}`, fallback); }
+    async function loadLibrary() { const data = await fetchJson("/api/tools/hebrew-terms"); libraryJson.value = JSON.stringify(data.entries || [], null, 2); }
+    async function beginCheckout(kind) { if (!activeJobId && kind === "job_unlock") throw new Error("Open a project before unlocking it."); if (!stripeEnabled) throw new Error("Stripe is not configured for this environment yet."); const payload = kind === "job_unlock" ? { kind, job_id: activeJobId } : { kind }; const data = await fetchJson("/api/billing/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }); window.location.href = data.url; }
+    tabButtons.forEach((button) => button.addEventListener("click", () => switchTab(button.dataset.tab)));
+    audioDropzone.addEventListener("dragover", (event) => { event.preventDefault(); audioDropzone.style.borderColor = "#8d6034"; });
+    audioDropzone.addEventListener("dragleave", () => { audioDropzone.style.borderColor = ""; });
+    audioDropzone.addEventListener("drop", (event) => { event.preventDefault(); audioDropzone.style.borderColor = ""; if (event.dataTransfer.files.length) audioInput.files = event.dataTransfer.files; });
+    createForm.addEventListener("submit", async (event) => { event.preventDefault(); try { setMessage(""); const formData = new FormData(createForm); const pastedTranscript = toolsTranscriptText.value.trim(); const pastedArticle = toolsArticleText.value.trim(); formData.delete("transcript_text"); formData.delete("pamphlet_text"); if (pastedTranscript) formData.append("transcript_text", pastedTranscript); if (pastedArticle) formData.append("pamphlet_text", pastedArticle); const data = await fetchJson("/api/jobs", { method: "POST", body: formData }); setMessage("Article project created."); await refreshJobs(); await loadJob(data.job_id); switchTab("generation"); } catch (error) { setMessage(error.message, "error"); } });
+    reviewForm.addEventListener("submit", async (event) => { event.preventDefault(); try { const answers = {}; reviewForm.querySelectorAll("input[type='text']").forEach((input) => { answers[input.name] = input.value.trim(); }); await fetchJson(`/api/jobs/${activeJobId}/review`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ answers }) }); setMessage("Clarifications saved."); await pollJob(activeJobId); } catch (error) { setMessage(error.message, "error"); } });
+    saveButton.addEventListener("click", async () => { try { await saveChanges(); } catch (error) { saveStatus.textContent = "Save failed."; setMessage(error.message, "error"); } });
+    previewPdfButton.addEventListener("click", async () => { try { await refreshPdfPreview(); } catch (error) { setMessage(error.message, "error"); } });
+    closePreviewButton.addEventListener("click", () => { pdfPreviewCard.classList.add("hidden"); pdfPreviewFrame.removeAttribute("src"); });
+    nextProjectButton.addEventListener("click", () => { resetWorkspace(); switchTab("generation"); });
+    cancelProjectButton.addEventListener("click", async () => { if (!activeJobId) return; try { await fetchJson(`/api/jobs/${activeJobId}/cancel`, { method: "POST" }); setMessage("Project canceled."); await loadJob(activeJobId); } catch (error) { setMessage(error.message, "error"); } });
+    deleteProjectButton.addEventListener("click", async () => { if (!activeJobId) return; try { await fetchJson(`/api/jobs/${activeJobId}`, { method: "DELETE" }); setMessage("Project deleted."); await refreshJobs(); resetWorkspace(); } catch (error) { setMessage(error.message, "error"); } });
+    refreshJobsButton.addEventListener("click", () => refreshJobs().catch((error) => setMessage(error.message, "error")));
+    saveLibraryButton.addEventListener("click", async () => { try { const parsed = JSON.parse(libraryJson.value || "[]"); await fetchJson("/api/tools/hebrew-terms", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ entries: parsed }) }); setMessage("Hebrew terms library saved."); await loadLibrary(); } catch (error) { setMessage(error.message, "error"); } });
+    unlockJobButton.addEventListener("click", async () => { try { await beginCheckout("job_unlock"); } catch (error) { setMessage(error.message, "error"); } });
+    subscribeButton.addEventListener("click", async () => { try { await beginCheckout("subscription"); } catch (error) { setMessage(error.message, "error"); } });
+    [editorTitle, editorText, transliterationMode, pdfLineSpacing, pdfFontSize, pdfBodyAlign, pdfBackgroundMode, pdfHeaderLeft, pdfHeaderRight, pdfFooterText, pdfHeaderLeftSize, pdfHeaderRightSize, pdfFooterSize, pdfHeaderLeftAlign, pdfHeaderRightAlign, pdfFooterAlign, pdfHeaderY, pdfFooterY, backgroundFile].forEach((element) => { element.addEventListener("input", markDirty); element.addEventListener("change", markDirty); });
+    pdfBackgroundMode.addEventListener("change", updateBackgroundField);
+    downloadPdf.addEventListener("click", async (event) => { event.preventDefault(); try { await downloadArtifact("pdf"); } catch (error) { setMessage(error.message, "error"); } });
+    downloadPng.addEventListener("click", async (event) => { event.preventDefault(); try { await downloadArtifact("png"); } catch (error) { setMessage(error.message, "error"); } });
+    toolsDownloadPdf.addEventListener("click", async (event) => { event.preventDefault(); try { await downloadArtifact("pdf"); } catch (error) { setMessage(error.message, "error"); } });
+    toolsDownloadPng.addEventListener("click", async (event) => { event.preventDefault(); try { await downloadArtifact("png"); } catch (error) { setMessage(error.message, "error"); } });
+    downloadDocx.addEventListener("click", async (event) => { event.preventDefault(); try { await downloadArtifact("docx"); } catch (error) { setMessage(error.message, "error"); } });
+    toolsDownloadDocx.addEventListener("click", async (event) => { event.preventDefault(); try { await downloadArtifact("docx"); } catch (error) { setMessage(error.message, "error"); } });
+    downloadTranscriptText.addEventListener("click", async (event) => { event.preventDefault(); try { await downloadArtifact("transcript"); } catch (error) { setMessage(error.message, "error"); } });
+    downloadArticleText.addEventListener("click", async (event) => { event.preventDefault(); try { await downloadArtifact("article"); } catch (error) { setMessage(error.message, "error"); } });
+    if (clerkEnabled && clerkSignoutButton) {
+      const clerkScript = document.createElement("script");
+      clerkScript.src = `https://${clerkFrontendApiUrl}/npm/@clerk/clerk-js@5/dist/clerk.browser.js`;
+      clerkScript.async = true;
+      clerkScript.onload = async () => {
+        const clerk = window.Clerk;
+        if (!clerk) return;
+        await clerk.load({ publishableKey: clerkPublishableKey });
+        clerkSignoutButton.addEventListener("click", async () => {
+          await clerk.signOut();
+          window.location.href = "/login";
+        });
+      };
+      document.head.appendChild(clerkScript);
+    }
+    renderHistory();
+    loadLibrary().catch((error) => setMessage(error.message, "error"));
+    if (initialSelectedJob && initialSelectedJob.id) { renderJob(initialSelectedJob); if (["queued", "running"].includes(initialSelectedJob.status)) pollJob(initialSelectedJob.id); } else { resetWorkspace(); }
+  </script>
+</body>
+</html>
+
+

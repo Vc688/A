@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ shul_name }} | Login</title>
+  <style>
+    :root {
+      --bg: #f4f1e8;
+      --paper: #fffdf7;
+      --ink: #1f2933;
+      --accent: #8a5a2f;
+      --border: #d9c9b4;
+      --muted: #5f6b76;
+      --danger: #9f1239;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at top right, #efe2cb 0%, var(--bg) 45%, #ece7dd 100%);
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      padding: 1rem;
+    }
+    .card {
+      width: min(420px, 100%);
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      box-shadow: 0 6px 18px rgba(17, 24, 39, 0.08);
+    }
+    h1 {
+      margin-top: 0;
+      color: #5a3a1f;
+    }
+    p {
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.35rem;
+      font-weight: 700;
+    }
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.7rem 0.8rem;
+      margin-bottom: 0.9rem;
+      font: inherit;
+      background: white;
+    }
+    button {
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      padding: 0.8rem 1rem;
+      background: var(--accent);
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      font: inherit;
+    }
+    .error {
+      margin-bottom: 1rem;
+      color: var(--danger);
+      background: #fff1f2;
+      border: 1px solid #fecaca;
+      border-radius: 10px;
+      padding: 0.8rem;
+    }
+    .helper {
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <section class="card">
+    <h1>{{ shul_name }}</h1>
+    <p>Log in to the browser-first audio-to-article app. This hosted copy is optimized for desktop and phone browsers.</p>
+    {% if clerk_enabled %}
+      <div id="clerk-auth-root"></div>
+      <p class="helper">Email/password and Google sign-in are managed through Clerk for the hosted app.</p>
+      <script src="https://{{ clerk_frontend_api_url }}/npm/@clerk/clerk-js@5/dist/clerk.browser.js"></script>
+      <script>
+        window.addEventListener("load", async () => {
+          const clerk = window.Clerk;
+          if (!clerk) return;
+          await clerk.load({
+            publishableKey: {{ clerk_publishable_key|tojson }},
+            signInForceRedirectUrl: {{ clerk_after_sign_in_url|tojson }},
+            signUpForceRedirectUrl: {{ clerk_after_sign_up_url|tojson }},
+          });
+          clerk.mountSignIn(document.getElementById("clerk-auth-root"), {
+            appearance: { elements: { formButtonPrimary: { backgroundColor: "#8a5a2f" } } },
+          });
+        });
+      </script>
+    {% else %}
+      {% if error %}
+        <div class="error">{{ error }}</div>
+      {% endif %}
+      <form method="post" action="/login">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" value="admin@torahcenter.app" required />
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" value="" required />
+        <button type="submit">Log In</button>
+      </form>
+      <p class="helper">Clerk is not configured yet, so the local fallback admin login is active.</p>
+    {% endif %}
+  </section>
+</body>
+</html>
