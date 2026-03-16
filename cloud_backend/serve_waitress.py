@@ -9,7 +9,7 @@ def log(message: str) -> None:
 
 
 def main() -> None:
-    host = os.getenv("HOST", "127.0.0.1")
+    host = os.getenv("HOST", "0.0.0.0")
     port = int(os.getenv("PORT", "8010"))
     threads = int(os.getenv("WAITRESS_THREADS", "8"))
     log(f"booting with host={host} port={port} threads={threads}")
