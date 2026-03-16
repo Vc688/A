@@ -1,17 +1,32 @@
 import os
+import traceback
 
 from waitress import serve
 
-from app import app, ensure_admin, init_db
+
+def log(message: str) -> None:
+    print(f"[serve_waitress] {message}", flush=True)
 
 
 def main() -> None:
-    init_db()
-    ensure_admin()
     host = os.getenv("HOST", "127.0.0.1")
     port = int(os.getenv("PORT", "8010"))
     threads = int(os.getenv("WAITRESS_THREADS", "8"))
-    serve(app, host=host, port=port, threads=threads)
+    log(f"booting with host={host} port={port} threads={threads}")
+    try:
+        log("importing app module")
+        from app import app, ensure_admin, init_db
+
+        log("initializing database")
+        init_db()
+        log("ensuring admin user")
+        ensure_admin()
+        log("starting waitress")
+        serve(app, host=host, port=port, threads=threads)
+    except Exception:
+        log("startup failed with exception")
+        traceback.print_exc()
+        raise
 
 
 if __name__ == "__main__":
