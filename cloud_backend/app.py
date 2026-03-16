@@ -343,7 +343,7 @@ def ensure_admin() -> None:
                 "UPDATE users SET password_hash = ?, role = 'admin' WHERE id = ?",
                 (password_hash, configured["id"]),
             )
-        elif default_row and default_row.get("password_hash") and check_password_hash(default_row["password_hash"], default_password):
+        elif default_row and default_row["password_hash"] and check_password_hash(default_row["password_hash"], default_password):
             # Migrate the untouched bootstrap admin account to the configured credentials.
             conn.execute(
                 "UPDATE users SET email = ?, password_hash = ?, role = 'admin' WHERE id = ?",
