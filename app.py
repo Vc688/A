@@ -343,7 +343,7 @@ def ensure_admin() -> None:
                 "UPDATE users SET password_hash = ?, role = 'admin' WHERE id = ?",
                 (password_hash, configured["id"]),
             )
-        elif default_row and default_row.get("password_hash") and check_password_hash(default_row["password_hash"], default_password):
+        elif default_row and default_row["password_hash"] and check_password_hash(default_row["password_hash"], default_password):
             # Migrate the untouched bootstrap admin account to the configured credentials.
             conn.execute(
                 "UPDATE users SET email = ?, password_hash = ?, role = 'admin' WHERE id = ?",
@@ -1093,10 +1093,16 @@ class DurationLimitExceededError(RuntimeError):
     pass
 
 
+def current_openai_api_key() -> str:
+    return os.getenv("OPENAI_API_KEY", "").strip() or OPENAI_API_KEY
+
+
 def openai_headers() -> dict:
-    if not OPENAI_API_KEY:
+    api_key = current_openai_api_key()
+    if not api_key:
         raise RuntimeError("OPENAI_API_KEY is missing. Add it to cloud_backend/.env before running the hosted app.")
-    return {"Authorization": f"Bearer {OPENAI_API_KEY}"}
+    legacy_app.OPENAI_API_KEY = api_key
+    return {"Authorization": f"Bearer {api_key}"}
 
 
 def openai_json_headers() -> dict:
