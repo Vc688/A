@@ -386,6 +386,8 @@ def job_from_row(row: sqlite3.Row) -> dict:
 def user_has_subscription(user: dict | None) -> bool:
     if not user:
         return False
+    if (user.get("role") or "").lower() == "admin":
+        return True
     return (user.get("subscription_status") or "").lower() in {"active", "trialing", "unlimited"}
 
 
@@ -1093,10 +1095,16 @@ class DurationLimitExceededError(RuntimeError):
     pass
 
 
+def current_openai_api_key() -> str:
+    return os.getenv("OPENAI_API_KEY", "").strip() or OPENAI_API_KEY
+
+
 def openai_headers() -> dict:
-    if not OPENAI_API_KEY:
+    api_key = current_openai_api_key()
+    if not api_key:
         raise RuntimeError("OPENAI_API_KEY is missing. Add it to cloud_backend/.env before running the hosted app.")
-    return {"Authorization": f"Bearer {OPENAI_API_KEY}"}
+    legacy_app.OPENAI_API_KEY = api_key
+    return {"Authorization": f"Bearer {api_key}"}
 
 
 def openai_json_headers() -> dict:
