@@ -13,6 +13,8 @@ def main() -> None:
     port = int(os.getenv("PORT", "8010"))
     threads = int(os.getenv("WAITRESS_THREADS", "8"))
     log(f"booting with host={host} port={port} threads={threads}")
+    api_key = os.getenv("OPENAI_API_KEY", "").strip()
+    log(f"OPENAI_API_KEY present={bool(api_key)} length={len(api_key)}")
     try:
         log("importing app module")
         from app import app, ensure_admin, init_db
