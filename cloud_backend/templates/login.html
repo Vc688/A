@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{{ shul_name }} | Login</title>
+  <title>{{ shul_name }} | {% if admin_mode %}Admin Login{% else %}Login{% endif %}</title>
   <style>
     :root {
       --bg: #f4f1e8;
@@ -13,6 +13,7 @@
       --border: #d9c9b4;
       --muted: #5f6b76;
       --danger: #9f1239;
+      --link: #6d4a28;
     }
     body {
       margin: 0;
@@ -25,25 +26,29 @@
       padding: 1rem;
     }
     .card {
-      width: min(420px, 100%);
+      width: min(460px, 100%);
       background: var(--paper);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 1.5rem;
-      box-shadow: 0 6px 18px rgba(17, 24, 39, 0.08);
+      border-radius: 18px;
+      padding: 1.6rem;
+      box-shadow: 0 8px 24px rgba(17, 24, 39, 0.08);
     }
     h1 {
       margin-top: 0;
+      margin-bottom: 0.65rem;
       color: #5a3a1f;
+      font-size: clamp(2rem, 6vw, 3.2rem);
     }
     p {
       color: var(--muted);
       line-height: 1.45;
+      margin-top: 0;
     }
     label {
       display: block;
       margin-bottom: 0.35rem;
       font-weight: 700;
+      color: #503620;
     }
     input {
       width: 100%;
@@ -59,7 +64,7 @@
       width: 100%;
       border: none;
       border-radius: 10px;
-      padding: 0.8rem 1rem;
+      padding: 0.85rem 1rem;
       background: var(--accent);
       color: white;
       font-weight: 700;
@@ -74,45 +79,96 @@
       border-radius: 10px;
       padding: 0.8rem;
     }
-    .helper {
-      font-size: 0.95rem;
+    .helper, .switcher {
+      font-size: 0.96rem;
+      margin-top: 1rem;
+    }
+    .helper a, .switcher a {
+      color: var(--link);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .helper a:hover, .switcher a:hover {
+      text-decoration: underline;
+    }
+    .section-sep {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
     }
   </style>
 </head>
 <body>
   <section class="card">
     <h1>{{ shul_name }}</h1>
-    <p>Log in to the browser-first audio-to-article app. This hosted copy is optimized for desktop and phone browsers.</p>
-    {% if clerk_enabled %}
+    {% if admin_mode %}
+      <p>Admin access for managing Torah Center. This fallback login is separate from the public member sign-in flow.</p>
+    {% else %}
+      <p>Log in to the browser-first audio-to-article app. This hosted copy is optimized for desktop and phone browsers.</p>
+    {% endif %}
+
+    {% if clerk_enabled and not admin_mode %}
       <div id="clerk-auth-root"></div>
+      <p class="switcher">Don't have an account? <a href="#" id="show-signup-link">Make one today!</a></p>
       <p class="helper">Email/password and Google sign-in are managed through Clerk for the hosted app.</p>
+      <p class="helper section-sep"><a href="/admin/login">Admin access</a></p>
       <script src="https://{{ clerk_frontend_api_url }}/npm/@clerk/clerk-js@5/dist/clerk.browser.js"></script>
       <script>
         window.addEventListener("load", async () => {
+          const root = document.getElementById("clerk-auth-root");
+          const signupLink = document.getElementById("show-signup-link");
           const clerk = window.Clerk;
-          if (!clerk) return;
+          if (!root || !clerk) return;
+
           await clerk.load({
             publishableKey: {{ clerk_publishable_key|tojson }},
             signInForceRedirectUrl: {{ clerk_after_sign_in_url|tojson }},
             signUpForceRedirectUrl: {{ clerk_after_sign_up_url|tojson }},
           });
-          clerk.mountSignIn(document.getElementById("clerk-auth-root"), {
-            appearance: { elements: { formButtonPrimary: { backgroundColor: "#8a5a2f" } } },
-          });
+
+          const appearance = {
+            elements: {
+              formButtonPrimary: { backgroundColor: "#8a5a2f" }
+            }
+          };
+
+          const mountSignIn = () => {
+            root.replaceChildren();
+            clerk.mountSignIn(root, { appearance });
+          };
+
+          const mountSignUp = () => {
+            root.replaceChildren();
+            clerk.mountSignUp(root, { appearance });
+          };
+
+          mountSignIn();
+          if (signupLink) {
+            signupLink.addEventListener("click", (event) => {
+              event.preventDefault();
+              mountSignUp();
+            });
+          }
         });
       </script>
     {% else %}
       {% if error %}
         <div class="error">{{ error }}</div>
       {% endif %}
-      <form method="post" action="/login">
+      <form method="post" action="{% if admin_mode %}/admin/login{% else %}/login{% endif %}">
         <label for="email">Email</label>
-        <input id="email" name="email" type="email" value="admin@torahcenter.app" required />
+        <input id="email" name="email" type="email" value="" autocomplete="email" required />
         <label for="password">Password</label>
-        <input id="password" name="password" type="password" value="" required />
-        <button type="submit">Log In</button>
+        <input id="password" name="password" type="password" value="" autocomplete="current-password" required />
+        <button type="submit">{% if admin_mode %}Log In as Admin{% else %}Log In{% endif %}</button>
       </form>
-      <p class="helper">Clerk is not configured yet, so the local fallback admin login is active.</p>
+      {% if admin_mode %}
+        <p class="helper">Need a regular account? <a href="/login">Return to public sign in</a></p>
+      {% else %}
+        <p class="switcher">Don't have an account? <a href="/login">Make one today!</a></p>
+        <p class="helper">Clerk is not configured yet, so the public signup flow is not active. For now, use an existing account or ask an admin to enable Clerk.</p>
+        <p class="helper section-sep"><a href="/admin/login">Admin access</a></p>
+      {% endif %}
     {% endif %}
   </section>
 </body>
