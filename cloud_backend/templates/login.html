@@ -108,46 +108,74 @@
     {% endif %}
 
     {% if clerk_enabled and not admin_mode %}
+      <div id="clerk-auth-error" class="error" style="display:none;"></div>
       <div id="clerk-auth-root"></div>
       <p class="switcher">Don't have an account? <a href="#" id="show-signup-link">Make one today!</a></p>
       <p class="helper">Email/password and Google sign-in are managed through Clerk for the hosted app.</p>
       <p class="helper section-sep"><a href="/admin/login">Admin access</a></p>
-      <script src="https://{{ clerk_frontend_api_url }}/npm/@clerk/clerk-js@5/dist/clerk.browser.js"></script>
-      <script>
+      <script type="module">
         window.addEventListener("load", async () => {
           const root = document.getElementById("clerk-auth-root");
+          const errorBox = document.getElementById("clerk-auth-error");
           const signupLink = document.getElementById("show-signup-link");
-          const clerk = window.Clerk;
-          if (!root || !clerk) return;
+          if (!root) return;
 
-          await clerk.load({
-            publishableKey: {{ clerk_publishable_key|tojson }},
-            signInForceRedirectUrl: {{ clerk_after_sign_in_url|tojson }},
-            signUpForceRedirectUrl: {{ clerk_after_sign_up_url|tojson }},
-          });
-
-          const appearance = {
-            elements: {
-              formButtonPrimary: { backgroundColor: "#8a5a2f" }
-            }
+          const showError = (message) => {
+            if (!errorBox) return;
+            errorBox.textContent = message;
+            errorBox.style.display = "block";
           };
 
-          const mountSignIn = () => {
-            root.replaceChildren();
-            clerk.mountSignIn(root, { appearance });
-          };
-
-          const mountSignUp = () => {
-            root.replaceChildren();
-            clerk.mountSignUp(root, { appearance });
-          };
-
-          mountSignIn();
-          if (signupLink) {
-            signupLink.addEventListener("click", (event) => {
-              event.preventDefault();
-              mountSignUp();
+          try {
+            const { Clerk } = await import("https://cdn.jsdelivr.net/npm/@clerk/clerk-js@5/+esm");
+            const clerk = new Clerk({{ clerk_publishable_key|tojson }}, {
+              domain: {{ clerk_frontend_api_url|tojson }},
             });
+
+            await clerk.load();
+
+            const appearance = {
+              elements: {
+                formButtonPrimary: { backgroundColor: "#8a5a2f" }
+              }
+            };
+
+            const mountSignIn = () => {
+              root.replaceChildren();
+              if (errorBox) errorBox.style.display = "none";
+              clerk.mountSignIn(root, {
+                appearance,
+                forceRedirectUrl: {{ clerk_after_sign_in_url|tojson }},
+                signUpUrl: window.location.pathname + "#signup",
+              });
+            };
+
+            const mountSignUp = () => {
+              root.replaceChildren();
+              if (errorBox) errorBox.style.display = "none";
+              clerk.mountSignUp(root, {
+                appearance,
+                forceRedirectUrl: {{ clerk_after_sign_up_url|tojson }},
+                signInUrl: window.location.pathname,
+              });
+            };
+
+            if (window.location.hash === "#signup") {
+              mountSignUp();
+            } else {
+              mountSignIn();
+            }
+
+            if (signupLink) {
+              signupLink.addEventListener("click", (event) => {
+                event.preventDefault();
+                history.replaceState(null, "", "#signup");
+                mountSignUp();
+              });
+            }
+          } catch (error) {
+            console.error("Clerk auth bootstrap failed", error);
+            showError("Clerk sign-in could not load. Please refresh the page or use admin access while Clerk is being configured.");
           }
         });
       </script>
