@@ -306,19 +306,22 @@
     downloadTranscriptText.addEventListener("click", async (event) => { event.preventDefault(); try { await downloadArtifact("transcript"); } catch (error) { setMessage(error.message, "error"); } });
     downloadArticleText.addEventListener("click", async (event) => { event.preventDefault(); try { await downloadArtifact("article"); } catch (error) { setMessage(error.message, "error"); } });
     if (clerkEnabled && clerkSignoutButton) {
-      const clerkScript = document.createElement("script");
-      clerkScript.src = `https://${clerkFrontendApiUrl}/npm/@clerk/clerk-js@5/dist/clerk.browser.js`;
-      clerkScript.async = true;
-      clerkScript.onload = async () => {
-        const clerk = window.Clerk;
-        if (!clerk) return;
-        await clerk.load({ publishableKey: clerkPublishableKey });
-        clerkSignoutButton.addEventListener("click", async () => {
+      clerkSignoutButton.addEventListener("click", async () => {
+        try {
+          const { Clerk } = await import("https://cdn.jsdelivr.net/npm/@clerk/clerk-js@5/+esm");
+          const clerk = new Clerk(clerkPublishableKey, { domain: clerkFrontendApiUrl });
+          await clerk.load();
           await clerk.signOut();
-          window.location.href = "/login";
-        });
-      };
-      document.head.appendChild(clerkScript);
+        } catch (error) {
+          console.error("Clerk sign out failed", error);
+        }
+        try {
+          await fetch("/logout", { method: "POST", credentials: "same-origin" });
+        } catch (error) {
+          console.error("Server logout failed", error);
+        }
+        window.location.href = "/login";
+      });
     }
     renderHistory();
     loadLibrary().catch((error) => setMessage(error.message, "error"));
