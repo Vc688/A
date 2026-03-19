@@ -863,6 +863,7 @@ def login_page():
         "login.html",
         shul_name=PRODUCT_NAME,
         error=None,
+        admin_mode=False,
         clerk_enabled=CLERK_ENABLED,
         clerk_publishable_key=CLERK_PUBLISHABLE_KEY,
         clerk_frontend_api_url=CLERK_FRONTEND_API_URL,
@@ -873,11 +874,63 @@ def login_page():
 
 @app.route("/login", methods=["POST"])
 def login_submit():
+    if CLERK_ENABLED:
+        return redirect(url_for("login_page"))
     email = legacy_app.clean_spacing(request.form.get("email", "")).lower()
     password = request.form.get("password", "")
     user = authenticate_credentials(email, password)
     if not user:
-        return render_template("login.html", shul_name=PRODUCT_NAME, error="Email or password is incorrect."), 401
+        return render_template(
+            "login.html",
+            shul_name=PRODUCT_NAME,
+            error="Email or password is incorrect.",
+            admin_mode=False,
+            clerk_enabled=CLERK_ENABLED,
+            clerk_publishable_key=CLERK_PUBLISHABLE_KEY,
+            clerk_frontend_api_url=CLERK_FRONTEND_API_URL,
+            clerk_after_sign_in_url=CLERK_AFTER_SIGN_IN_URL,
+            clerk_after_sign_up_url=CLERK_AFTER_SIGN_UP_URL,
+        ), 401
+    session["user_id"] = user["id"]
+    session["user_email"] = user["email"]
+    return redirect(url_for("home_page"))
+
+
+@app.route("/admin/login", methods=["GET"])
+def admin_login_page():
+    user = browser_user()
+    if user:
+        return redirect(url_for("home_page"))
+    return render_template(
+        "login.html",
+        shul_name=PRODUCT_NAME,
+        error=None,
+        admin_mode=True,
+        clerk_enabled=CLERK_ENABLED,
+        clerk_publishable_key=CLERK_PUBLISHABLE_KEY,
+        clerk_frontend_api_url=CLERK_FRONTEND_API_URL,
+        clerk_after_sign_in_url=CLERK_AFTER_SIGN_IN_URL,
+        clerk_after_sign_up_url=CLERK_AFTER_SIGN_UP_URL,
+    )
+
+
+@app.route("/admin/login", methods=["POST"])
+def admin_login_submit():
+    email = legacy_app.clean_spacing(request.form.get("email", "")).lower()
+    password = request.form.get("password", "")
+    user = authenticate_credentials(email, password)
+    if not user or (user.get("role") or "").lower() != "admin":
+        return render_template(
+            "login.html",
+            shul_name=PRODUCT_NAME,
+            error="Admin email or password is incorrect.",
+            admin_mode=True,
+            clerk_enabled=CLERK_ENABLED,
+            clerk_publishable_key=CLERK_PUBLISHABLE_KEY,
+            clerk_frontend_api_url=CLERK_FRONTEND_API_URL,
+            clerk_after_sign_in_url=CLERK_AFTER_SIGN_IN_URL,
+            clerk_after_sign_up_url=CLERK_AFTER_SIGN_UP_URL,
+        ), 401
     session["user_id"] = user["id"]
     session["user_email"] = user["email"]
     return redirect(url_for("home_page"))
