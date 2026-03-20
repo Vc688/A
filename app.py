@@ -93,6 +93,7 @@ TRANSCRIBE_MODEL = os.getenv("TRANSCRIBE_MODEL", getattr(legacy_app, "TRANSCRIBE
 REVIEW_MODEL = os.getenv("REVIEW_MODEL", getattr(legacy_app, "REVIEW_MODEL", "gpt-4.1-mini"))
 ARTICLE_MODEL = os.getenv("ARTICLE_MODEL", os.getenv("PAMPHLET_MODEL", getattr(legacy_app, "PAMPHLET_MODEL", "gpt-4.1")))
 TRANSCRIBE_CHUNK_SECONDS = int(os.getenv("TRANSCRIBE_CHUNK_SECONDS", str(getattr(legacy_app, "TRANSCRIBE_CHUNK_SECONDS", 1200))))
+TRANSCRIBE_MAX_DURATION_SECONDS = int(os.getenv("TRANSCRIBE_MAX_DURATION_SECONDS", "1400"))
 CLERK_PUBLISHABLE_KEY = os.getenv("CLERK_PUBLISHABLE_KEY", "").strip()
 CLERK_SECRET_KEY = os.getenv("CLERK_SECRET_KEY", "").strip()
 CLERK_FRONTEND_API_URL = os.getenv("CLERK_FRONTEND_API_URL", "").strip().rstrip("/")
@@ -386,6 +387,8 @@ def job_from_row(row: sqlite3.Row) -> dict:
 def user_has_subscription(user: dict | None) -> bool:
     if not user:
         return False
+    if (user.get("role") or "").lower() == "admin":
+        return True
     return (user.get("subscription_status") or "").lower() in {"active", "trialing", "unlimited"}
 
 
@@ -670,7 +673,7 @@ def upsert_clerk_user(clerk_user_id: str, email: str) -> dict:
         user_id = uuid.uuid4().hex
         conn.execute(
             "INSERT INTO users (id, clerk_user_id, email, password_hash, subscription_status, role, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (user_id, clerk_user_id, email, None, "inactive", "member", now_iso()),
+            (user_id, clerk_user_id, email, "", "inactive", "member", now_iso()),
         )
         conn.commit()
         row = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
@@ -765,11 +768,16 @@ def current_clerk_user() -> dict | None:
         return None
     existing = fetch_user_by_clerk_user_id(clerk_user_id)
     if existing:
+        session["user_id"] = existing["id"]
+        session["user_email"] = existing["email"]
         return existing
     email = legacy_app.clean_spacing((claims.get("email") or claims.get("email_address") or "")).lower()
     if not email:
         email = clerk_user_email(clerk_user_id)
-    return upsert_clerk_user(clerk_user_id, email)
+    user = upsert_clerk_user(clerk_user_id, email)
+    session["user_id"] = user["id"]
+    session["user_email"] = user["email"]
+    return user
 
 
 def current_session_user() -> dict | None:
@@ -861,6 +869,7 @@ def login_page():
         "login.html",
         shul_name=PRODUCT_NAME,
         error=None,
+        admin_mode=False,
         clerk_enabled=CLERK_ENABLED,
         clerk_publishable_key=CLERK_PUBLISHABLE_KEY,
         clerk_frontend_api_url=CLERK_FRONTEND_API_URL,
@@ -871,11 +880,63 @@ def login_page():
 
 @app.route("/login", methods=["POST"])
 def login_submit():
+    if CLERK_ENABLED:
+        return redirect(url_for("login_page"))
     email = legacy_app.clean_spacing(request.form.get("email", "")).lower()
     password = request.form.get("password", "")
     user = authenticate_credentials(email, password)
     if not user:
-        return render_template("login.html", shul_name=PRODUCT_NAME, error="Email or password is incorrect."), 401
+        return render_template(
+            "login.html",
+            shul_name=PRODUCT_NAME,
+            error="Email or password is incorrect.",
+            admin_mode=False,
+            clerk_enabled=CLERK_ENABLED,
+            clerk_publishable_key=CLERK_PUBLISHABLE_KEY,
+            clerk_frontend_api_url=CLERK_FRONTEND_API_URL,
+            clerk_after_sign_in_url=CLERK_AFTER_SIGN_IN_URL,
+            clerk_after_sign_up_url=CLERK_AFTER_SIGN_UP_URL,
+        ), 401
+    session["user_id"] = user["id"]
+    session["user_email"] = user["email"]
+    return redirect(url_for("home_page"))
+
+
+@app.route("/admin/login", methods=["GET"])
+def admin_login_page():
+    user = browser_user()
+    if user:
+        return redirect(url_for("home_page"))
+    return render_template(
+        "login.html",
+        shul_name=PRODUCT_NAME,
+        error=None,
+        admin_mode=True,
+        clerk_enabled=CLERK_ENABLED,
+        clerk_publishable_key=CLERK_PUBLISHABLE_KEY,
+        clerk_frontend_api_url=CLERK_FRONTEND_API_URL,
+        clerk_after_sign_in_url=CLERK_AFTER_SIGN_IN_URL,
+        clerk_after_sign_up_url=CLERK_AFTER_SIGN_UP_URL,
+    )
+
+
+@app.route("/admin/login", methods=["POST"])
+def admin_login_submit():
+    email = legacy_app.clean_spacing(request.form.get("email", "")).lower()
+    password = request.form.get("password", "")
+    user = authenticate_credentials(email, password)
+    if not user or (user.get("role") or "").lower() != "admin":
+        return render_template(
+            "login.html",
+            shul_name=PRODUCT_NAME,
+            error="Admin email or password is incorrect.",
+            admin_mode=True,
+            clerk_enabled=CLERK_ENABLED,
+            clerk_publishable_key=CLERK_PUBLISHABLE_KEY,
+            clerk_frontend_api_url=CLERK_FRONTEND_API_URL,
+            clerk_after_sign_in_url=CLERK_AFTER_SIGN_IN_URL,
+            clerk_after_sign_up_url=CLERK_AFTER_SIGN_UP_URL,
+        ), 401
     session["user_id"] = user["id"]
     session["user_email"] = user["email"]
     return redirect(url_for("home_page"))
@@ -1426,6 +1487,20 @@ def transcribe_media_with_skill(file_path: Path, job_id: str | None = None) -> s
             )
         return transcribe_media_with_chunks(file_path, job_id=job_id, split_reason="size")
 
+    try:
+        source_duration = legacy_app.media_duration_seconds(file_path)
+    except Exception:
+        source_duration = 0.0
+    if source_duration > TRANSCRIBE_MAX_DURATION_SECONDS:
+        if job_id:
+            update_job(
+                job_id,
+                status="running",
+                progress=18,
+                message="Long audio detected. Splitting it into smaller chunks before transcription.",
+            )
+        return transcribe_media_with_chunks(file_path, job_id=job_id, split_reason="duration")
+
     if job_id:
         update_job(
             job_id,
@@ -1433,7 +1508,17 @@ def transcribe_media_with_skill(file_path: Path, job_id: str | None = None) -> s
             progress=20,
             message="Transcribing audio with OpenAI while preserving Hebrew transliterations.",
         )
-    return transcribe_chunk_openai(file_path)
+    try:
+        return transcribe_chunk_openai(file_path)
+    except DurationLimitExceededError:
+        if job_id:
+            update_job(
+                job_id,
+                status="running",
+                progress=18,
+                message="Long audio detected. Splitting it into smaller chunks before transcription.",
+            )
+        return transcribe_media_with_chunks(file_path, job_id=job_id, split_reason="duration")
 
 
 def build_article_prompt(rabbi_name: str, topic: str, transcript: str, glossary_entries, voice_profile: dict | None) -> str:
