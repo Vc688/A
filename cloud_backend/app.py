@@ -672,7 +672,7 @@ def upsert_clerk_user(clerk_user_id: str, email: str) -> dict:
         user_id = uuid.uuid4().hex
         conn.execute(
             "INSERT INTO users (id, clerk_user_id, email, password_hash, subscription_status, role, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (user_id, clerk_user_id, email, None, "inactive", "member", now_iso()),
+            (user_id, clerk_user_id, email, "", "inactive", "member", now_iso()),
         )
         conn.commit()
         row = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
