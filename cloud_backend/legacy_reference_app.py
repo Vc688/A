@@ -30,6 +30,8 @@ MAX_AUDIO_BYTES = 25 * 1024 * 1024
 TARGET_CHUNK_BYTES = int(MAX_AUDIO_BYTES * 0.88)
 RETRYABLE_STATUS_CODES = {408, 429, 500, 502, 503, 504}
 TRANSCRIBE_CHUNK_SECONDS = int(os.getenv("TRANSCRIBE_CHUNK_SECONDS", "1200"))
+CHET_MARKER_LOWER = "ḥ"
+CHET_MARKER_UPPER = "Ḥ"
 
 
 def load_env_file(path: Path) -> None:
@@ -204,6 +206,34 @@ def replace_phrase(text: str, phrase: str, replacement: str) -> str:
     return re.sub(pattern, replacement, text, flags=re.IGNORECASE)
 
 
+def prefer_chet_marker(text: str) -> str:
+    if not text:
+        return ""
+
+    def repl(match: re.Match) -> str:
+        value = match.group(0)
+        if value.isupper():
+            return CHET_MARKER_UPPER
+        if value[0].isupper():
+            return CHET_MARKER_UPPER
+        return CHET_MARKER_LOWER
+
+    return re.sub(r"ch(?=[aeiou])", repl, text, flags=re.IGNORECASE)
+
+
+def chet_spelling_variants(text: str) -> list[str]:
+    cleaned = clean_spacing(text)
+    if not cleaned:
+        return []
+    preferred = prefer_chet_marker(cleaned)
+    ascii_fallback = preferred.replace(CHET_MARKER_UPPER, "Ch").replace(CHET_MARKER_LOWER, "ch")
+    variants = []
+    for value in (preferred, ascii_fallback, cleaned):
+        if value and value not in variants:
+            variants.append(value)
+    return variants
+
+
 def matched_glossary_entries(text: str):
     lowered = text.lower()
     collapsed = normalize_for_match(text)
@@ -221,10 +251,10 @@ def matched_glossary_entries(text: str):
 
 
 def suggest_glossary_entries(text: str):
-    suggestions = [entry["display"] for entry in matched_glossary_entries(text)[:4]]
+    suggestions = [prefer_chet_marker(entry["display"]) for entry in matched_glossary_entries(text)[:4]]
     for memory_entry in memory_lookup_entries():
         raw_text = clean_spacing(memory_entry.get("raw_text", ""))
-        replacement = clean_spacing(memory_entry.get("replacement", ""))
+        replacement = prefer_chet_marker(clean_spacing(memory_entry.get("replacement", "")))
         if raw_text and raw_text.lower() in text.lower() and replacement and replacement not in suggestions:
             suggestions.insert(0, replacement)
     return suggestions[:4]
@@ -233,15 +263,20 @@ def suggest_glossary_entries(text: str):
 def glossary_context(entries) -> str:
     if not entries:
         return "No glossary matches were identified for this shiur."
-    lines = [f'- {entry["display"]}' for entry in entries[:18]]
+    lines = [f'- {prefer_chet_marker(entry["display"])}' for entry in entries[:18]]
     return "\n".join(lines)
 
 
 def normalize_confirmed_terms(text: str) -> str:
     normalized = text
     for entry in GLOSSARY_ENTRIES:
-        for variant in entry["variants"]:
-            normalized = replace_phrase(normalized, variant, entry["display"])
+        replacement = prefer_chet_marker(entry["display"])
+        for variant in chet_spelling_variants(entry.get("canonical", "")) + chet_spelling_variants(entry.get("display", "")) + [
+            variant_text
+            for variant in entry["variants"]
+            for variant_text in chet_spelling_variants(variant)
+        ]:
+            normalized = replace_phrase(normalized, variant, replacement)
     return clean_spacing(normalized)
 
 
@@ -257,7 +292,7 @@ def remember_clarifications(review_items, clarifications) -> None:
         by_raw = {entry.get("raw_text", "").lower(): entry for entry in entries}
         for item in review_items:
             raw_text = clean_spacing(item.get("raw_text", ""))
-            replacement = clean_spacing(clarifications.get(item["id"], ""))
+            replacement = prefer_chet_marker(clean_spacing(clarifications.get(item["id"], "")))
             if not raw_text or not replacement:
                 continue
             key = raw_text.lower()
@@ -281,7 +316,7 @@ def apply_memory_clarifications(text: str) -> str:
     updated = text
     for entry in memory_lookup_entries():
         raw_text = clean_spacing(entry.get("raw_text", ""))
-        replacement = clean_spacing(entry.get("replacement", ""))
+        replacement = prefer_chet_marker(clean_spacing(entry.get("replacement", "")))
         if not raw_text or not replacement:
             continue
         updated = replace_phrase(updated, raw_text, replacement)
@@ -1052,6 +1087,7 @@ def build_review_prompt(chunked_transcript: str) -> str:
         "- context: a short surrounding excerpt\n"
         "- reason: brief explanation\n"
         "- suggestion: best guess in transliteration + English, or empty string if unsure\n"
+        "Use ḥ for the Hebrew letter ח, plain h for ה, and keep כ/ך distinct from ḥ.\n"
         "Limit to at most 8 items.\n\n"
         "Relevant glossary forms:\n"
         f"{glossary_context(GLOSSARY_ENTRIES[:18])}\n\n"
@@ -1108,7 +1144,7 @@ def detect_review_items(transcript: str):
                 "raw_text": raw_text,
                 "context": context,
                 "reason": clean_spacing(item.get("reason", "")),
-                "suggestions": [clean_spacing(item.get("suggestion", ""))] if clean_spacing(item.get("suggestion", "")) else suggest_glossary_entries(context),
+                "suggestions": [prefer_chet_marker(clean_spacing(item.get("suggestion", "")))] if clean_spacing(item.get("suggestion", "")) else suggest_glossary_entries(context),
             }
         )
     return items
@@ -1117,7 +1153,7 @@ def detect_review_items(transcript: str):
 def apply_clarifications(transcript: str, review_items, clarifications) -> str:
     clarified = transcript
     for item in review_items:
-        replacement = clean_spacing(clarifications.get(item["id"], ""))
+        replacement = prefer_chet_marker(clean_spacing(clarifications.get(item["id"], "")))
         if not replacement:
             continue
         clarified = clarified.replace(item["raw_text"], replacement, 1)
@@ -1179,6 +1215,7 @@ def build_pamphlet_prompt(rabbi_name: str, topic: str, transcript: str, glossary
         f"3. Third line exactly: By Rabbi {rabbi_name}\n"
         "4. Then an opening paragraph, three or four integrated body paragraphs, and a closing takeaway paragraph.\n"
         "Use transliteration + English for Torah and Hebrew terms. Prefer the glossary spellings below when relevant.\n"
+        "Render the Hebrew letter ח as ḥ, plain h for ה, and keep כ/ך distinct from ḥ.\n"
         "Do not invent facts or sources beyond what is grounded in the transcript.\n\n"
         "Relevant glossary forms:\n"
         f"{glossary_context(glossary_entries)}\n\n"

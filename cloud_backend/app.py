@@ -420,7 +420,44 @@ def default_terms_library() -> dict:
                 "variants": [raw_text],
             }
         )
-    return {"entries": entries, "updated_at": now_iso()}
+    return {"entries": normalize_library_entries(entries), "updated_at": now_iso()}
+
+
+def normalize_library_entry(entry: dict) -> dict | None:
+    display_raw = legacy_app.clean_spacing(entry.get("display", ""))
+    if not display_raw:
+        return None
+    canonical_raw = legacy_app.clean_spacing(entry.get("canonical", "")) or display_raw
+    display = legacy_app.prefer_chet_marker(display_raw)
+    canonical = legacy_app.prefer_chet_marker(canonical_raw)
+    variants = []
+    for value in [display_raw, canonical_raw, display, canonical, *entry.get("variants", [])]:
+        cleaned = legacy_app.clean_spacing(value)
+        if not cleaned:
+            continue
+        for variant in legacy_app.chet_spelling_variants(cleaned):
+            if variant not in variants and variant not in {display, canonical}:
+                variants.append(variant)
+    return {
+        "canonical": canonical,
+        "display": display,
+        "variants": variants,
+    }
+
+
+def normalize_library_entries(entries: list[dict]) -> list[dict]:
+    normalized_entries = []
+    seen = set()
+    for entry in entries:
+        normalized = normalize_library_entry(entry)
+        if not normalized:
+            continue
+        key = normalized["canonical"].lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        normalized_entries.append(normalized)
+    return normalized_entries
 
 
 def load_terms_library() -> dict:
@@ -429,16 +466,44 @@ def load_terms_library() -> dict:
         TERMS_LIBRARY_PATH.write_text(json.dumps(library, indent=2), encoding="utf-8")
         return library
     with TERMS_LIBRARY_PATH.open(encoding="utf-8") as handle:
-        return json.load(handle)
+        library = json.load(handle)
+    normalized_entries = normalize_library_entries(library.get("entries", []))
+    if normalized_entries != library.get("entries", []):
+        library = {"entries": normalized_entries, "updated_at": now_iso()}
+        TERMS_LIBRARY_PATH.write_text(json.dumps(library, indent=2, ensure_ascii=False), encoding="utf-8")
+        return library
+    return library
 
 
 def save_terms_library(library: dict) -> None:
+    library["entries"] = normalize_library_entries(library.get("entries", []))
     library["updated_at"] = now_iso()
-    TERMS_LIBRARY_PATH.write_text(json.dumps(library, indent=2), encoding="utf-8")
+    TERMS_LIBRARY_PATH.write_text(json.dumps(library, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
 def library_entries() -> list[dict]:
     return load_terms_library().get("entries", [])
+
+
+def normalize_terms_with_library(text: str) -> str:
+    normalized = legacy_app.clean_spacing(text)
+    if not normalized:
+        return ""
+    for entry in library_entries():
+        replacement = legacy_app.prefer_chet_marker(legacy_app.clean_spacing(entry.get("display", "")))
+        if not replacement:
+            continue
+        candidates = []
+        for value in [entry.get("canonical", ""), entry.get("display", ""), *(entry.get("variants", []) or [])]:
+            cleaned = legacy_app.clean_spacing(value)
+            if not cleaned:
+                continue
+            for variant in legacy_app.chet_spelling_variants(cleaned):
+                if variant not in candidates:
+                    candidates.append(variant)
+        for candidate in candidates:
+            normalized = legacy_app.replace_phrase(normalized, candidate, replacement)
+    return legacy_app.clean_spacing(normalized)
 
 
 def create_job_record(user_id: str, rabbi_name: str, topic: str, transliteration_mode: str = "auto") -> str:
@@ -768,11 +833,16 @@ def current_clerk_user() -> dict | None:
         return None
     existing = fetch_user_by_clerk_user_id(clerk_user_id)
     if existing:
+        session["user_id"] = existing["id"]
+        session["user_email"] = existing["email"]
         return existing
     email = legacy_app.clean_spacing((claims.get("email") or claims.get("email_address") or "")).lower()
     if not email:
         email = clerk_user_email(clerk_user_id)
-    return upsert_clerk_user(clerk_user_id, email)
+    user = upsert_clerk_user(clerk_user_id, email)
+    session["user_id"] = user["id"]
+    session["user_email"] = user["email"]
+    return user
 
 
 def current_session_user() -> dict | None:
@@ -1100,6 +1170,7 @@ def build_skill_transcription_prompt() -> str:
     return (
         "Transcribe this media into readable English text.\n"
         "Preserve Hebrew names, Jewish terms, and transliterated religious language as accurately as possible.\n"
+        "When transliterating Hebrew, render ח as ḥ, keep ה as plain h, and keep כ/ך distinct from ḥ.\n"
         "Do not replace unclear Hebrew or transliterated words with generic placeholders like 'foreign language' or 'unclear term'.\n"
         "If a Hebrew term is uncertain, transcribe the closest plausible sound and use a narrow uncertainty note only if needed.\n"
         "Do not summarize, rewrite into an article, or flatten domain vocabulary.\n\n"
@@ -1262,6 +1333,7 @@ def build_transliteration_prompt(transcript: str) -> str:
         "Return strict JSON with keys `transcript` and `low_confidence_items`.\n"
         "`transcript` must be the full transcript with Hebrew/Jewish terms lightly normalized into readable English transliteration.\n"
         "`low_confidence_items` must be a list of objects with keys `raw_text`, `suggested`, and `context` for only the uncertain terms that still need a person to review.\n"
+        "Render the Hebrew letter ח as ḥ, keep ה as plain h, and keep כ/ך distinct from ḥ.\n"
         "Do not summarize. Do not remove content. Do not replace unknown terms with generic placeholders.\n"
         "Use the provided library and repeated context from the transcript before marking anything uncertain.\n\n"
         "Hebrew terms library:\n"
@@ -1286,19 +1358,20 @@ def auto_transliterate_transcript(transcript: str) -> tuple[str, list[dict]]:
         model=REVIEW_MODEL,
         temperature=0.1,
     )
-    transliterated = legacy_app.clean_spacing(parsed.get("transcript", transcript))
+    transliterated = normalize_terms_with_library(legacy_app.clean_spacing(parsed.get("transcript", transcript)))
     review_items = []
     for index, item in enumerate(parsed.get("low_confidence_items", []), start=1):
         raw_text = legacy_app.clean_spacing(item.get("raw_text", ""))
         if not raw_text:
             continue
+        suggested = normalize_terms_with_library(legacy_app.clean_spacing(item.get("suggested", "")))
         review_items.append(
             {
                 "id": f"auto_{index}",
                 "raw_text": raw_text,
                 "context": legacy_app.clean_spacing(item.get("context", "")) or raw_text,
-                "suggestions": [legacy_app.clean_spacing(item.get("suggested", ""))] if legacy_app.clean_spacing(item.get("suggested", "")) else [],
-                "clarification": legacy_app.clean_spacing(item.get("suggested", "")),
+                "suggestions": [suggested] if suggested else [],
+                "clarification": suggested,
             }
         )
     return transliterated, review_items
@@ -1535,6 +1608,7 @@ def build_article_prompt(rabbi_name: str, topic: str, transcript: str, glossary_
         "Use the speaker's own turns of phrase wherever they read naturally on the page.\n"
         "Preserve at least three signature phrases or quoted lines when the transcript supports them.\n"
         "For most sentences, stay very close to transcript wording.\n"
+        "Render the Hebrew letter ח as ḥ, keep ה as plain h, and keep כ/ך distinct from ḥ.\n"
         "Do not use recap language like 'the lecture discusses', 'the Rabbi explains', 'this class covers', or 'the speaker says'.\n"
         "Do not add facts that are not grounded in the transcript.\n"
         "Do not include a title line, byline, or section labels in the generated body.\n"
@@ -1572,6 +1646,7 @@ def refine_article_for_voice(article: str, transcript: str, voice_profile: dict 
                     "Rebuild sentences from transcript wording wherever possible.\n"
                     "Keep the article composed mostly from transcript language rather than fresh paraphrase.\n"
                     "Keep it publication-ready and within one page.\n"
+                    "Preserve the transliteration rule that ח is written as ḥ, while ה stays h and כ/ך remain distinct.\n"
                     "Remove any recap/report framing.\n"
                     f"Voice notes: {json.dumps(voice_profile or {}, ensure_ascii=True)}\n\n"
                     f"Transcript:\n{transcript}\n\n"
@@ -1582,10 +1657,25 @@ def refine_article_for_voice(article: str, transcript: str, voice_profile: dict 
         model=ARTICLE_MODEL,
         temperature=0.35,
     )
-    return legacy_app.clean_spacing(content)
+    return normalize_terms_with_library(legacy_app.clean_spacing(content))
 
 
-def generate_article(rabbi_name: str, topic: str, transcript: str, glossary_entries, voice_profile: dict | None) -> str:
+def generate_article(
+    rabbi_name: str,
+    topic: str,
+    transcript: str,
+    glossary_entries,
+    voice_profile: dict | None,
+    *,
+    job_id: str | None = None,
+) -> str:
+    if job_id:
+        update_job(
+            job_id,
+            status="running",
+            progress=86,
+            message="Drafting the article from the transcript.",
+        )
     article = legacy_app.clean_spacing(
         openai_chat(
             [
@@ -1606,16 +1696,30 @@ def generate_article(rabbi_name: str, topic: str, transcript: str, glossary_entr
     )
     if not article:
         raise RuntimeError("OpenAI article generation returned empty text.")
+    if job_id:
+        update_job(
+            job_id,
+            status="running",
+            progress=92,
+            message="Polishing the article in the speaker's voice.",
+        )
     article = refine_article_for_voice(article, transcript, voice_profile)
     if re.search(r"\b(the lecture discusses|the rabbi explains|this class covers|the speaker says|the text covers)\b", article, flags=re.IGNORECASE):
+        if job_id:
+            update_job(
+                job_id,
+                status="running",
+                progress=96,
+                message="Finalizing the article wording.",
+            )
         article = refine_article_for_voice(article, transcript, voice_profile)
-    return article
+    return normalize_terms_with_library(article)
 
 
 def finalize_transcript_for_mode(transcript: str, transliteration_mode: str) -> str:
     if transliteration_mode == "hebrew":
         return transcript
-    return legacy_app.normalize_confirmed_terms(transcript)
+    return normalize_terms_with_library(legacy_app.normalize_confirmed_terms(transcript))
 
 
 def finish_transcript_pipeline(job_id: str, transcript: str) -> None:
@@ -1659,17 +1763,23 @@ def finish_transcript_pipeline(job_id: str, transcript: str) -> None:
 
     final_transcript = finalize_transcript_for_mode(transliterated_transcript, transliteration_mode)
     glossary_entries = legacy_app.matched_glossary_entries(final_transcript)
+    update_job(
+        job_id,
+        status="running",
+        progress=78,
+        final_transcript=final_transcript,
+        review_status="completed",
+        message="Analyzing the speaker's voice and priorities.",
+    )
     voice_profile = analyze_voice(final_transcript)
     update_job(
         job_id,
         status="running",
-        progress=82,
-        final_transcript=final_transcript,
-        review_status="completed",
+        progress=84,
         voice_profile=json.dumps(voice_profile),
-        message="Writing the article in the speaker's voice.",
+        message="Voice profile ready. Drafting the article.",
     )
-    article = generate_article(job["rabbi_name"], job["topic"], final_transcript, glossary_entries, voice_profile)
+    article = generate_article(job["rabbi_name"], job["topic"], final_transcript, glossary_entries, voice_profile, job_id=job_id)
     billing_state = "unlocked" if user_has_subscription(owner) else "locked"
     message = "Article ready." if billing_state == "unlocked" else "Article ready. Unlock it to view the transcript and exports."
     update_job(job_id, status="completed", progress=100, message=message, one_pager=article, edited_one_pager=article, billing_state=billing_state)
@@ -2243,22 +2353,7 @@ def save_hebrew_terms():
     entries = payload.get("entries")
     if not isinstance(entries, list):
         return jsonify({"error": "Entries must be a list."}), 400
-    normalized_entries = []
-    for entry in entries:
-        display = legacy_app.clean_spacing(entry.get("display", ""))
-        if not display:
-            continue
-        normalized_entries.append(
-            {
-                "canonical": legacy_app.clean_spacing(entry.get("canonical", "")) or display,
-                "display": display,
-                "variants": [
-                    legacy_app.clean_spacing(variant)
-                    for variant in entry.get("variants", [])
-                    if legacy_app.clean_spacing(variant)
-                ],
-            }
-        )
+    normalized_entries = normalize_library_entries(entries)
     library = {"entries": normalized_entries}
     save_terms_library(library)
     return jsonify({"ok": True, "library": library})
@@ -2363,7 +2458,7 @@ def review_job(job_id: str):
                 progress=84,
                 message="Voice profile ready. Drafting the article.",
             )
-            article = generate_article(job["rabbi_name"], job["topic"], final_transcript, glossary_entries, voice_profile)
+            article = generate_article(job["rabbi_name"], job["topic"], final_transcript, glossary_entries, voice_profile, job_id=job_id)
             billing_state = "unlocked" if user_has_subscription(owner) else "locked"
             message = "Article ready." if billing_state == "unlocked" else "Article ready. Unlock it to view the transcript and exports."
             update_job(job_id, status="completed", progress=100, message=message, one_pager=article, edited_one_pager=article, billing_state=billing_state)
