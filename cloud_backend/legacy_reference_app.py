@@ -30,6 +30,7 @@ MAX_AUDIO_BYTES = 25 * 1024 * 1024
 TARGET_CHUNK_BYTES = int(MAX_AUDIO_BYTES * 0.88)
 RETRYABLE_STATUS_CODES = {408, 429, 500, 502, 503, 504}
 TRANSCRIBE_CHUNK_SECONDS = int(os.getenv("TRANSCRIBE_CHUNK_SECONDS", "1200"))
+SUPPORTED_AUDIO_EXTENSIONS = {".mp3", ".mp4", ".ogg", ".mpeg"}
 CHET_MARKER_LOWER = "ḥ"
 CHET_MARKER_UPPER = "Ḥ"
 
@@ -118,7 +119,7 @@ def convert_media_to_mp3(file_path: Path) -> Path:
     ffmpeg = ffmpeg_path()
     if not ffmpeg:
         raise RuntimeError(
-            "An .mp4 file was uploaded, but ffmpeg is not installed or configured, so the app cannot convert it to .mp3 first."
+            f"A {file_path.suffix.lower() or 'media'} file was uploaded, but ffmpeg is not installed or configured, so the app cannot convert it to .mp3 first."
         )
 
     output_path = file_path.with_suffix(".mp3")
@@ -139,7 +140,7 @@ def convert_media_to_mp3(file_path: Path) -> Path:
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0 or not output_path.exists():
         detail = (result.stderr or result.stdout or "").strip()
-        raise RuntimeError(f"ffmpeg could not convert the .mp4 file into .mp3: {detail}")
+        raise RuntimeError(f"ffmpeg could not convert the {file_path.suffix.lower() or 'media'} file into .mp3: {detail}")
     return output_path
 
 
@@ -1360,12 +1361,12 @@ def process_job(job_id: str, target_path: Path) -> None:
 
     try:
         transcribe_path = target_path
-        if target_path.suffix.lower() == ".mp4":
+        if target_path.suffix.lower() != ".mp3":
             update_job(
                 job_id,
                 status="running",
                 progress=12,
-                message="Converting video to .mp3 before transcription.",
+                message="Converting uploaded media to .mp3 before transcription.",
             )
             transcribe_path = convert_media_to_mp3(target_path)
 
@@ -1495,8 +1496,8 @@ def process_upload():
         worker = threading.Thread(target=process_pasted_transcript, args=(job_id, transcript_text), daemon=True)
     else:
         suffix = Path(audio.filename).suffix.lower()
-        if suffix not in {".mp3", ".mp4"}:
-            return jsonify({"error": "Only .mp3 and .mp4 files are supported right now."}), 400
+        if suffix not in SUPPORTED_AUDIO_EXTENSIONS:
+            return jsonify({"error": "Only .mp3, .mp4, .ogg, and .mpeg files are supported right now."}), 400
         target_path = UPLOAD_DIR / safe_filename(audio.filename)
         audio.save(target_path)
         worker = threading.Thread(target=process_job, args=(job_id, target_path), daemon=True)

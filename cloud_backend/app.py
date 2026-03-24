@@ -94,6 +94,7 @@ REVIEW_MODEL = os.getenv("REVIEW_MODEL", getattr(legacy_app, "REVIEW_MODEL", "gp
 ARTICLE_MODEL = os.getenv("ARTICLE_MODEL", os.getenv("PAMPHLET_MODEL", getattr(legacy_app, "PAMPHLET_MODEL", "gpt-4.1")))
 TRANSCRIBE_CHUNK_SECONDS = int(os.getenv("TRANSCRIBE_CHUNK_SECONDS", str(getattr(legacy_app, "TRANSCRIBE_CHUNK_SECONDS", 1200))))
 TRANSCRIBE_MAX_DURATION_SECONDS = int(os.getenv("TRANSCRIBE_MAX_DURATION_SECONDS", "1400"))
+SUPPORTED_AUDIO_EXTENSIONS = {".mp3", ".mp4", ".ogg", ".mpeg"}
 CLERK_PUBLISHABLE_KEY = os.getenv("CLERK_PUBLISHABLE_KEY", "").strip()
 CLERK_SECRET_KEY = os.getenv("CLERK_SECRET_KEY", "").strip()
 CLERK_FRONTEND_API_URL = os.getenv("CLERK_FRONTEND_API_URL", "").strip().rstrip("/")
@@ -1101,12 +1102,22 @@ def store_uploaded_file(file_storage, folder: Path, prefix: str = "uploads") -> 
 def sanitize_job_for_user(job: dict, user: dict | None) -> dict:
     sanitized = dict(job)
     access_locked = False
+    transcript_locked = False
+    is_admin = (user.get("role") or "").lower() == "admin" if user else False
+    if not is_admin and not job_is_unlocked(sanitized, user):
+        transcript_locked = True
     if sanitized.get("status") == "completed" and not job_is_unlocked(sanitized, user):
         access_locked = True
+    if transcript_locked:
+        for key in ("raw_transcript", "final_transcript"):
+            sanitized[key] = None
+    if access_locked:
         for key in ("raw_transcript", "final_transcript", "one_pager", "edited_one_pager"):
             sanitized[key] = None
         sanitized["message"] = "Article complete. Unlock it to view the transcript, article, and export tools."
     sanitized["access_locked"] = access_locked
+    sanitized["transcript_locked"] = transcript_locked
+    sanitized["is_admin"] = is_admin
     sanitized["can_unlock"] = sanitized.get("status") == "completed" and not user_has_subscription(user)
     sanitized["has_subscription"] = user_has_subscription(user)
     sanitized["single_unlock_price_cents"] = SINGLE_UNLOCK_PRICE_CENTS
@@ -1809,8 +1820,8 @@ def process_job(job_id: str, source_kind: str, source_path: str | Path | None = 
         with stored_file_path(source_name, suffix=suffix) as local_path_str:
             transcribe_path = Path(local_path_str)
             cleanup_mp3 = None
-            if transcribe_path.suffix.lower() == ".mp4":
-                update_job(job_id, status="running", progress=12, message="Converting video to .mp3 before transcription.")
+            if transcribe_path.suffix.lower() != ".mp3":
+                update_job(job_id, status="running", progress=12, message="Converting uploaded media to .mp3 before transcription.")
                 transcribe_path = legacy_app.convert_media_to_mp3(transcribe_path)
                 cleanup_mp3 = transcribe_path
 
@@ -2388,8 +2399,8 @@ def create_job():
         worker = threading.Thread(target=process_job, args=(job_id, "transcript", None, transcript_text, None), daemon=True)
     else:
         extension = Path(audio.filename).suffix.lower()
-        if extension not in {".mp3", ".mp4"}:
-            return jsonify({"error": "Only .mp3 and .mp4 files are supported."}), 400
+        if extension not in SUPPORTED_AUDIO_EXTENSIONS:
+            return jsonify({"error": "Only .mp3, .mp4, .ogg, and .mpeg files are supported."}), 400
         source_path = store_uploaded_file(audio, UPLOAD_DIR)
         update_job(job_id, source_kind="audio", source_path=str(source_path))
         worker = threading.Thread(target=process_job, args=(job_id, "audio", source_path, None, None), daemon=True)
