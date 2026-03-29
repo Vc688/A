@@ -1303,6 +1303,13 @@ def openai_json(messages: list[dict], *, model: str, temperature: float = 0.1) -
         raise RuntimeError(f"OpenAI returned invalid JSON: {content}") from exc
 
 
+def log_job_step(job_id: str | None, step: str, **details) -> None:
+    detail_parts = [f"{key}={value}" for key, value in details.items()]
+    suffix = f" {' '.join(detail_parts)}" if detail_parts else ""
+    prefix = f"[job {job_id}] " if job_id else ""
+    print(f"{prefix}{step}{suffix}", flush=True)
+
+
 def transcribe_chunk_openai(file_path: Path) -> str:
     with file_path.open("rb") as audio_file:
         response = openai_request(
@@ -1360,7 +1367,8 @@ def build_transliteration_prompt(transcript: str) -> str:
     )
 
 
-def auto_transliterate_transcript(transcript: str) -> tuple[str, list[dict]]:
+def auto_transliterate_transcript(transcript: str, *, job_id: str | None = None) -> tuple[str, list[dict]]:
+    log_job_step(job_id, "starting auto transliteration", transcript_chars=len(transcript or ""))
     parsed = openai_json(
         [
             {
@@ -1391,6 +1399,7 @@ def auto_transliterate_transcript(transcript: str) -> tuple[str, list[dict]]:
                 "clarification": suggested,
             }
         )
+    log_job_step(job_id, "auto transliteration returned", low_confidence=len(parsed.get("low_confidence_items", []) or []))
     return transliterated, review_items
 
 
@@ -1409,7 +1418,8 @@ def build_hebrew_render_prompt(transcript: str) -> str:
     )
 
 
-def render_hebrew_terms_transcript(transcript: str) -> tuple[str, list[dict]]:
+def render_hebrew_terms_transcript(transcript: str, *, job_id: str | None = None) -> tuple[str, list[dict]]:
+    log_job_step(job_id, "starting hebrew rendering", transcript_chars=len(transcript or ""))
     parsed = openai_json(
         [
             {
@@ -1440,6 +1450,7 @@ def render_hebrew_terms_transcript(transcript: str) -> tuple[str, list[dict]]:
                 "clarification": suggested,
             }
         )
+    log_job_step(job_id, "hebrew rendering returned", low_confidence=len(parsed.get("low_confidence_items", []) or []))
     return rendered, review_items
 
 
@@ -1486,8 +1497,9 @@ def transcript_language_anchors(transcript: str) -> list[str]:
     return unique
 
 
-def analyze_voice(transcript: str) -> dict:
-    return openai_json(
+def analyze_voice(transcript: str, *, job_id: str | None = None) -> dict:
+    log_job_step(job_id, "starting voice analysis", transcript_chars=len(transcript or ""))
+    result = openai_json(
         [
             {
                 "role": "system",
@@ -1501,6 +1513,8 @@ def analyze_voice(transcript: str) -> dict:
         model=REVIEW_MODEL,
         temperature=0.2,
     )
+    log_job_step(job_id, "voice analysis returned", signature_phrases=len(result.get("signature_phrases", []) or []))
+    return result
 
 
 def transcribe_media_with_chunks(file_path: Path, *, job_id: str | None = None, split_reason: str = "size") -> str:
@@ -1689,6 +1703,7 @@ def generate_article(
     job_id: str | None = None,
 ) -> str:
     if job_id:
+        log_job_step(job_id, "starting article generation", topic=legacy_app.clean_spacing(topic or "")[:80])
         update_job(
             job_id,
             status="running",
@@ -1716,6 +1731,7 @@ def generate_article(
     if not article:
         raise RuntimeError("OpenAI article generation returned empty text.")
     if job_id:
+        log_job_step(job_id, "article draft returned", article_chars=len(article))
         update_job(
             job_id,
             status="running",
@@ -1750,25 +1766,30 @@ def finish_transcript_pipeline(job_id: str, transcript: str) -> None:
     owner = fetch_user_by_id(job["user_id"])
     raw_transcript = legacy_app.apply_memory_clarifications(transcript)
     transliteration_mode = (job.get("transliteration_mode") or "auto").strip().lower()
+    log_job_step(job_id, "entered transcript pipeline", transliteration_mode=transliteration_mode, transcript_chars=len(raw_transcript or ""))
     update_job(job_id, progress=70, message="Reviewing the transcript for Hebrew transliteration and voice cues.", raw_transcript=raw_transcript)
     transliterated_transcript = raw_transcript
     review_items = []
     if transliteration_mode == "auto":
         try:
-            transliterated_transcript, review_items = auto_transliterate_transcript(raw_transcript)
-        except Exception:
+            transliterated_transcript, review_items = auto_transliterate_transcript(raw_transcript, job_id=job_id)
+        except Exception as exc:
+            log_job_step(job_id, "auto transliteration failed", error=type(exc).__name__)
             transliterated_transcript = raw_transcript
             review_items = legacy_app.detect_review_items(raw_transcript)
     elif transliteration_mode == "hebrew":
         try:
-            transliterated_transcript, review_items = render_hebrew_terms_transcript(raw_transcript)
-        except Exception:
+            transliterated_transcript, review_items = render_hebrew_terms_transcript(raw_transcript, job_id=job_id)
+        except Exception as exc:
+            log_job_step(job_id, "hebrew rendering failed", error=type(exc).__name__)
             transliterated_transcript = raw_transcript
             review_items = legacy_app.detect_review_items(raw_transcript)
     else:
         review_items = legacy_app.detect_review_items(raw_transcript)
+    log_job_step(job_id, "transcript review stage complete", review_items=len(review_items))
 
     if review_items:
+        log_job_step(job_id, "job awaiting review", review_items=len(review_items))
         update_job(
             job_id,
             status="needs_review",
@@ -1782,6 +1803,7 @@ def finish_transcript_pipeline(job_id: str, transcript: str) -> None:
 
     final_transcript = finalize_transcript_for_mode(transliterated_transcript, transliteration_mode)
     glossary_entries = legacy_app.matched_glossary_entries(final_transcript)
+    log_job_step(job_id, "final transcript ready", transcript_chars=len(final_transcript or ""), glossary_matches=len(glossary_entries or []))
     update_job(
         job_id,
         status="running",
@@ -1790,7 +1812,7 @@ def finish_transcript_pipeline(job_id: str, transcript: str) -> None:
         review_status="completed",
         message="Analyzing the speaker's voice and priorities.",
     )
-    voice_profile = analyze_voice(final_transcript)
+    voice_profile = analyze_voice(final_transcript, job_id=job_id)
     update_job(
         job_id,
         status="running",
@@ -1801,6 +1823,7 @@ def finish_transcript_pipeline(job_id: str, transcript: str) -> None:
     article = generate_article(job["rabbi_name"], job["topic"], final_transcript, glossary_entries, voice_profile, job_id=job_id)
     billing_state = "unlocked" if user_has_subscription(owner) else "locked"
     message = "Article ready." if billing_state == "unlocked" else "Article ready. Unlock it to view the transcript and exports."
+    log_job_step(job_id, "job completed", billing_state=billing_state)
     update_job(job_id, status="completed", progress=100, message=message, one_pager=article, edited_one_pager=article, billing_state=billing_state)
 
 
