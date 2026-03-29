@@ -82,6 +82,7 @@ SHUL_NAME = os.getenv("SHUL_NAME", PRODUCT_NAME)
 DEFAULT_HEADER_LEFT = os.getenv("DEFAULT_PDF_HEADER_LEFT", PRODUCT_NAME)
 DEFAULT_HEADER_RIGHT = os.getenv("DEFAULT_PDF_HEADER_RIGHT", "Torah from our Rabbis")
 DEFAULT_FOOTER_TEXT = os.getenv("DEFAULT_PDF_FOOTER_TEXT", PRODUCT_NAME)
+DEFAULT_PDF_BODY_START_Y = float(os.getenv("DEFAULT_PDF_BODY_START_Y", "648"))
 LETTER_WIDTH = 612.0
 LETTER_HEIGHT = 792.0
 SKILL_SOURCE_LIMIT_BYTES = 50 * 1024 * 1024
@@ -239,6 +240,7 @@ def init_db() -> None:
               pdf_body_align TEXT NOT NULL DEFAULT 'left',
               pdf_header_y REAL NOT NULL DEFAULT 738,
               pdf_footer_y REAL NOT NULL DEFAULT 30,
+              pdf_body_start_y REAL NOT NULL DEFAULT 648,
               source_kind TEXT,
               source_path TEXT,
               transcript_input TEXT,
@@ -293,6 +295,7 @@ def init_db() -> None:
             "pdf_body_align": "ALTER TABLE jobs ADD COLUMN pdf_body_align TEXT NOT NULL DEFAULT 'left'",
             "pdf_header_y": "ALTER TABLE jobs ADD COLUMN pdf_header_y REAL NOT NULL DEFAULT 738",
             "pdf_footer_y": "ALTER TABLE jobs ADD COLUMN pdf_footer_y REAL NOT NULL DEFAULT 30",
+            "pdf_body_start_y": "ALTER TABLE jobs ADD COLUMN pdf_body_start_y REAL NOT NULL DEFAULT 648",
             "source_kind": "ALTER TABLE jobs ADD COLUMN source_kind TEXT",
             "source_path": "ALTER TABLE jobs ADD COLUMN source_path TEXT",
             "transcript_input": "ALTER TABLE jobs ADD COLUMN transcript_input TEXT",
@@ -319,6 +322,7 @@ def init_db() -> None:
         conn.execute("UPDATE jobs SET pdf_font_size = 12 WHERE pdf_font_size IS NULL OR pdf_font_size <= 0")
         conn.execute("UPDATE jobs SET pdf_line_spacing = 1.0 WHERE pdf_line_spacing IS NULL OR pdf_line_spacing <= 0")
         conn.execute("UPDATE jobs SET pdf_body_align = 'left' WHERE pdf_body_align IS NULL OR TRIM(pdf_body_align) = ''")
+        conn.execute("UPDATE jobs SET pdf_body_start_y = ? WHERE pdf_body_start_y IS NULL OR pdf_body_start_y <= 0", (DEFAULT_PDF_BODY_START_Y,))
         conn.execute("UPDATE jobs SET billing_state = 'locked' WHERE billing_state IS NULL OR TRIM(billing_state) = ''")
         conn.execute("UPDATE users SET subscription_status = 'inactive' WHERE subscription_status IS NULL OR TRIM(subscription_status) = ''")
         conn.execute("CREATE INDEX IF NOT EXISTS jobs_user_id_idx ON jobs (user_id)")
@@ -522,10 +526,10 @@ def create_job_record(user_id: str, rabbi_name: str, topic: str, transliteration
               pdf_header_left, pdf_header_right, pdf_footer_text,
               pdf_header_left_size, pdf_header_right_size, pdf_footer_size,
               pdf_header_left_align, pdf_header_right_align, pdf_footer_align, pdf_body_align,
-              pdf_header_y, pdf_footer_y, source_kind, source_path, transcript_input, pamphlet_input,
+              pdf_header_y, pdf_footer_y, pdf_body_start_y, source_kind, source_path, transcript_input, pamphlet_input,
               billing_state, stripe_checkout_session_id, stripe_payment_intent_id, unlocked_at,
               error, created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 job_id,
@@ -559,6 +563,7 @@ def create_job_record(user_id: str, rabbi_name: str, topic: str, transliteration
                 "left",
                 738.0,
                 30.0,
+                DEFAULT_PDF_BODY_START_Y,
                 None,
                 None,
                 None,
@@ -1345,6 +1350,7 @@ def build_transliteration_prompt(transcript: str) -> str:
         "`transcript` must be the full transcript with Hebrew/Jewish terms lightly normalized into readable English transliteration.\n"
         "`low_confidence_items` must be a list of objects with keys `raw_text`, `suggested`, and `context` for only the uncertain terms that still need a person to review.\n"
         "Render the Hebrew letter ח as ḥ, keep ה as plain h, and keep כ/ך distinct from ḥ.\n"
+        "Only use á¸¥/á¸¤ inside actual Hebrew or Jewish transliterations. Never rewrite ordinary English words such as teacher, school, or mechanic.\n"
         "Do not summarize. Do not remove content. Do not replace unknown terms with generic placeholders.\n"
         "Use the provided library and repeated context from the transcript before marking anything uncertain.\n\n"
         "Hebrew terms library:\n"
@@ -1620,6 +1626,7 @@ def build_article_prompt(rabbi_name: str, topic: str, transcript: str, glossary_
         "Preserve at least three signature phrases or quoted lines when the transcript supports them.\n"
         "For most sentences, stay very close to transcript wording.\n"
         "Render the Hebrew letter ח as ḥ, keep ה as plain h, and keep כ/ך distinct from ḥ.\n"
+        "Only use á¸¥/á¸¤ inside actual Hebrew or Jewish transliterations. Never rewrite ordinary English words such as teacher, school, or mechanic.\n"
         "Do not use recap language like 'the lecture discusses', 'the Rabbi explains', 'this class covers', or 'the speaker says'.\n"
         "Do not add facts that are not grounded in the transcript.\n"
         "Do not include a title line, byline, or section labels in the generated body.\n"
@@ -1658,6 +1665,7 @@ def refine_article_for_voice(article: str, transcript: str, voice_profile: dict 
                     "Keep the article composed mostly from transcript language rather than fresh paraphrase.\n"
                     "Keep it publication-ready and within one page.\n"
                     "Preserve the transliteration rule that ח is written as ḥ, while ה stays h and כ/ך remain distinct.\n"
+                    "Only use á¸¥/á¸¤ inside actual Hebrew or Jewish transliterations. Never rewrite ordinary English words such as teacher, school, or mechanic.\n"
                     "Remove any recap/report framing.\n"
                     f"Voice notes: {json.dumps(voice_profile or {}, ensure_ascii=True)}\n\n"
                     f"Transcript:\n{transcript}\n\n"
@@ -2000,6 +2008,8 @@ def wrap_lines(text: str, font_name: str, font_size: float, max_width: float) ->
 
 PDF_TEXT_TRANSLATIONS = str.maketrans(
     {
+        "\u1e24": "H\u0323",
+        "\u1e25": "h\u0323",
         "\u2018": "'",
         "\u2019": "'",
         "\u201c": '"',
@@ -2013,8 +2023,52 @@ PDF_TEXT_TRANSLATIONS = str.maketrans(
 
 
 def pdf_safe_text(text: str) -> str:
-    normalized = unicodedata.normalize("NFKC", text or "").translate(PDF_TEXT_TRANSLATIONS)
-    return "".join(character if ord(character) < 128 else "?" for character in normalized)
+    return unicodedata.normalize("NFKC", text or "").translate(PDF_TEXT_TRANSLATIONS)
+
+
+PDF_FONT_NAMES = {
+    "regular": "TorahPDF-Regular",
+    "bold": "TorahPDF-Bold",
+    "italic": "TorahPDF-Italic",
+    "bold_italic": "TorahPDF-BoldItalic",
+}
+PDF_FONTS_REGISTERED = False
+
+
+def ensure_pdf_fonts_registered() -> dict[str, str]:
+    global PDF_FONTS_REGISTERED
+    if PDF_FONTS_REGISTERED:
+        return PDF_FONT_NAMES
+
+    from reportlab import __file__ as reportlab_file
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+
+    bundled_font_dir = BACKEND_DIR / "fonts"
+    reportlab_font_dir = Path(reportlab_file).resolve().parent / "fonts"
+    font_dir = bundled_font_dir if (bundled_font_dir / "DejaVuSerif.ttf").exists() else reportlab_font_dir
+    font_files = {
+        "regular": font_dir / ("DejaVuSerif.ttf" if font_dir == bundled_font_dir else "Vera.ttf"),
+        "bold": font_dir / ("DejaVuSerif-Bold.ttf" if font_dir == bundled_font_dir else "VeraBd.ttf"),
+        "italic": font_dir / ("DejaVuSerif-Italic.ttf" if font_dir == bundled_font_dir else "VeraIt.ttf"),
+        "bold_italic": font_dir / ("DejaVuSerif-BoldItalic.ttf" if font_dir == bundled_font_dir else "VeraBI.ttf"),
+    }
+    for key, path in font_files.items():
+        if not path.exists():
+            raise RuntimeError(f"Required PDF font file is missing: {path.name}")
+        try:
+            pdfmetrics.getFont(PDF_FONT_NAMES[key])
+        except KeyError:
+            pdfmetrics.registerFont(TTFont(PDF_FONT_NAMES[key], str(path)))
+    pdfmetrics.registerFontFamily(
+        "TorahPDF",
+        normal=PDF_FONT_NAMES["regular"],
+        bold=PDF_FONT_NAMES["bold"],
+        italic=PDF_FONT_NAMES["italic"],
+        boldItalic=PDF_FONT_NAMES["bold_italic"],
+    )
+    PDF_FONTS_REGISTERED = True
+    return PDF_FONT_NAMES
 
 
 def fit_pdf_layout(job: dict) -> dict:
@@ -2038,7 +2092,7 @@ def fit_pdf_layout(job: dict) -> dict:
     paragraph_gap = max(6, font_size * 0.8)
     wrapped: list[list[str]] = []
     for paragraph in paragraphs:
-        wrapped.append(wrap_lines(paragraph, "Times-Roman", font_size, body_width))
+        wrapped.append(wrap_lines(paragraph, PDF_FONT_NAMES["regular"], font_size, body_width))
     return {
         "font_size": font_size,
         "line_height": line_height,
@@ -2061,6 +2115,7 @@ def build_pdf_bytes(job: dict) -> BytesIO:
     except ImportError as exc:
         raise RuntimeError("reportlab is required for PDF export. Restart the backend after installing updated requirements.") from exc
 
+    fonts = ensure_pdf_fonts_registered()
     topic = pdf_safe_text(legacy_app.clean_spacing(job.get("topic", "")))
     rabbi_name = pdf_safe_text(legacy_app.clean_spacing(job.get("rabbi_name", "")))
     paragraphs = legacy_app.split_pamphlet_body(
@@ -2082,6 +2137,7 @@ def build_pdf_bytes(job: dict) -> BytesIO:
     footer_size = float(job.get("pdf_footer_size") or 10.0)
     header_y = float(job.get("pdf_header_y") or 738.0)
     footer_y = float(job.get("pdf_footer_y") or 30.0)
+    body_start_y = float(job.get("pdf_body_start_y") or DEFAULT_PDF_BODY_START_Y)
     header_left_align = (job.get("pdf_header_left_align") or "left").strip().lower()
     header_right_align = (job.get("pdf_header_right_align") or "right").strip().lower()
     footer_align = (job.get("pdf_footer_align") or "center").strip().lower()
@@ -2127,17 +2183,17 @@ def build_pdf_bytes(job: dict) -> BytesIO:
             canvas_obj.line(46, 724, 566, 724)
             canvas_obj.line(46, 46, 566, 46)
             canvas_obj.restoreState()
-        draw_aligned_text(canvas_obj, header_left, "Times-Roman" if mode != "custom" else "Times-Bold", header_left_size, header_left_align, 64, header_y, "#9e7a6b")
-        draw_aligned_text(canvas_obj, header_right, "Times-Italic", header_right_size, header_right_align, 404, header_y, "#9e7a6b")
+        draw_aligned_text(canvas_obj, header_left, fonts["bold"] if mode == "custom" else fonts["regular"], header_left_size, header_left_align, 64, header_y, "#9e7a6b")
+        draw_aligned_text(canvas_obj, header_right, fonts["italic"], header_right_size, header_right_align, 404, header_y, "#9e7a6b")
         if include_title:
-            draw_aligned_text(canvas_obj, topic, "Times-Bold", 19, "center", 76, 690, "#333333")
+            draw_aligned_text(canvas_obj, topic, fonts["bold"], 19, "center", 76, 690, "#333333")
             byline = f"By {rabbi_name}" if rabbi_name else ""
-            draw_aligned_text(canvas_obj, byline, "Times-Italic", 12, "center", 100, 670, "#5c514a")
-        draw_aligned_text(canvas_obj, footer_text, "Times-Roman", footer_size, footer_align, 160, footer_y, "#5c514a")
+            draw_aligned_text(canvas_obj, byline, fonts["italic"], 12, "center", 100, 670, "#5c514a")
+        draw_aligned_text(canvas_obj, footer_text, fonts["regular"], footer_size, footer_align, 160, footer_y, "#5c514a")
 
-    first_page_top = min(620, header_y - 118)
     continuation_page_top = min(690, header_y - 34)
     bottom_limit = max(76, footer_y + 48)
+    first_page_top = min(max(body_start_y, bottom_limit + 36), continuation_page_top)
     first_frame = Frame(54, bottom_limit, 504, max(36, first_page_top - bottom_limit), leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0, id="first")
     later_frame = Frame(54, bottom_limit, 504, max(36, continuation_page_top - bottom_limit), leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0, id="later")
 
@@ -2149,7 +2205,7 @@ def build_pdf_bytes(job: dict) -> BytesIO:
     }
     body_style = ParagraphStyle(
         "Body",
-        fontName="Times-Roman",
+        fontName=fonts["regular"],
         fontSize=font_size,
         leading=leading,
         alignment=align_map.get(body_align, TA_LEFT),
@@ -2515,6 +2571,7 @@ def update_job_payload(job_id: str):
         footer_size = float(payload.get("pdf_footer_size", job.get("pdf_footer_size", 10.0)) or 10.0)
         header_y = float(payload.get("pdf_header_y", job.get("pdf_header_y", 738.0)) or 738.0)
         footer_y = float(payload.get("pdf_footer_y", job.get("pdf_footer_y", 30.0)) or 30.0)
+        body_start_y = float(payload.get("pdf_body_start_y", job.get("pdf_body_start_y", DEFAULT_PDF_BODY_START_Y)) or DEFAULT_PDF_BODY_START_Y)
     except (TypeError, ValueError):
         return jsonify({"error": "Export settings are invalid."}), 400
 
@@ -2532,6 +2589,8 @@ def update_job_payload(job_id: str):
         return jsonify({"error": "Body line spacing must be between 0.5 and 3.0."}), 400
     if font_size <= 0:
         return jsonify({"error": "Body font size must be greater than 0."}), 400
+    if not 560 <= body_start_y <= 690:
+        return jsonify({"error": "Body start position must be between 560 and 690."}), 400
 
     update_job(
         job_id,
@@ -2553,6 +2612,7 @@ def update_job_payload(job_id: str):
         pdf_body_align=body_align,
         pdf_header_y=header_y,
         pdf_footer_y=footer_y,
+        pdf_body_start_y=body_start_y,
     )
     return jsonify({"ok": True})
 
@@ -2618,6 +2678,25 @@ def preview_pdf(job_id: str):
     try:
         ensure_job_content_access(job, request.current_user)
         return send_file(build_pdf_bytes(job), mimetype="application/pdf", as_attachment=False, download_name=legacy_app.pdf_filename(job))
+    except RuntimeError as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
+@app.route("/api/jobs/<job_id>/png/preview", methods=["GET"])
+@require_auth
+def preview_png(job_id: str):
+    job = get_job(job_id, request.current_user["id"])
+    if not job:
+        return jsonify({"error": "Job not found."}), 404
+    try:
+        ensure_job_content_access(job, request.current_user)
+        png_name = f"{legacy_app.pdf_filename(job).rsplit('.', 1)[0]}.png"
+        return send_file(
+            build_png_bytes(job),
+            mimetype="image/png",
+            as_attachment=False,
+            download_name=png_name,
+        )
     except RuntimeError as exc:
         return jsonify({"error": str(exc)}), 400
 

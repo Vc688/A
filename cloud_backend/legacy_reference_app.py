@@ -31,8 +31,28 @@ TARGET_CHUNK_BYTES = int(MAX_AUDIO_BYTES * 0.88)
 RETRYABLE_STATUS_CODES = {408, 429, 500, 502, 503, 504}
 TRANSCRIBE_CHUNK_SECONDS = int(os.getenv("TRANSCRIBE_CHUNK_SECONDS", "1200"))
 SUPPORTED_AUDIO_EXTENSIONS = {".mp3", ".mp4", ".ogg", ".mpeg"}
-CHET_MARKER_LOWER = "ḥ"
-CHET_MARKER_UPPER = "Ḥ"
+CHET_MARKER_LOWER = "h\u0323"
+CHET_MARKER_UPPER = "H\u0323"
+ENGLISH_CH_EXCEPTIONS = {
+    "teacher",
+    "teachers",
+    "teaching",
+    "teach",
+    "teaches",
+    "child",
+    "children",
+    "choice",
+    "choices",
+    "change",
+    "changes",
+    "chance",
+    "chapter",
+    "chapters",
+    "church",
+    "churches",
+    "school",
+    "schools",
+}
 
 
 def load_env_file(path: Path) -> None:
@@ -207,6 +227,35 @@ def replace_phrase(text: str, phrase: str, replacement: str) -> str:
     return re.sub(pattern, replacement, text, flags=re.IGNORECASE)
 
 
+def transform_outside_parentheses(text: str, transformer) -> str:
+    if not text:
+        return ""
+    parts: list[str] = []
+    chunk: list[str] = []
+    depth = 0
+    for character in text:
+        if character == "(":
+            if chunk:
+                segment = "".join(chunk)
+                parts.append(transformer(segment) if depth == 0 else segment)
+                chunk = []
+            depth += 1
+            parts.append(character)
+            continue
+        if character == ")":
+            if chunk:
+                parts.append("".join(chunk))
+                chunk = []
+            depth = max(0, depth - 1)
+            parts.append(character)
+            continue
+        chunk.append(character)
+    if chunk:
+        segment = "".join(chunk)
+        parts.append(transformer(segment) if depth == 0 else segment)
+    return "".join(parts)
+
+
 def prefer_chet_marker(text: str) -> str:
     if not text:
         return ""
@@ -219,7 +268,16 @@ def prefer_chet_marker(text: str) -> str:
             return CHET_MARKER_UPPER
         return CHET_MARKER_LOWER
 
-    return re.sub(r"ch(?=[aeiou])", repl, text, flags=re.IGNORECASE)
+    def replace_in_word(match: re.Match) -> str:
+        word = match.group(0)
+        if word.lower() in ENGLISH_CH_EXCEPTIONS:
+            return word
+        return re.sub(r"ch(?=[aeiou])", repl, word, flags=re.IGNORECASE)
+
+    return transform_outside_parentheses(
+        text,
+        lambda segment: re.sub(r"[A-Za-z]+", replace_in_word, segment),
+    )
 
 
 def chet_spelling_variants(text: str) -> list[str]:
