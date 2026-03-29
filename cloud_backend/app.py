@@ -2008,8 +2008,6 @@ def wrap_lines(text: str, font_name: str, font_size: float, max_width: float) ->
 
 PDF_TEXT_TRANSLATIONS = str.maketrans(
     {
-        "\u1e24": "H\u0323",
-        "\u1e25": "h\u0323",
         "\u2018": "'",
         "\u2019": "'",
         "\u201c": '"',
@@ -2023,7 +2021,9 @@ PDF_TEXT_TRANSLATIONS = str.maketrans(
 
 
 def pdf_safe_text(text: str) -> str:
-    return unicodedata.normalize("NFKC", text or "").translate(PDF_TEXT_TRANSLATIONS)
+    normalized = unicodedata.normalize("NFKC", text or "")
+    normalized = normalized.replace("H\u0323", "\u1e24").replace("h\u0323", "\u1e25")
+    return normalized.translate(PDF_TEXT_TRANSLATIONS)
 
 
 PDF_FONT_NAMES = {
