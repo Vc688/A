@@ -44,7 +44,14 @@
     .job-card.active { border-color:var(--accent); }
     .chip { display:inline-flex; width:max-content; padding:.35rem .6rem; border-radius:999px; background:#ead8c3; color:#6b4b2a; font-size:.86rem; font-weight:700; }
     .preview-shell { border:1px solid var(--line); border-radius:14px; overflow:hidden; background:white; }
-    .preview-frame { width:100%; height:640px; border:0; background:white; }
+    .preview-stage { position:relative; width:100%; max-width:720px; margin:0 auto; aspect-ratio:612 / 792; background:white; }
+    .preview-image { width:100%; height:100%; display:block; object-fit:contain; background:white; }
+    .preview-overlay { position:absolute; inset:0; pointer-events:none; }
+    .preview-guide { position:absolute; left:8%; right:8%; border-top:2px dashed rgba(141, 96, 52, 0.35); }
+    .preview-guide.footer { border-top:none; border-bottom:2px dashed rgba(141, 96, 52, 0.35); }
+    .preview-guide.body { left:9%; right:9%; border-top:2px dashed rgba(47, 107, 80, 0.4); }
+    .preview-handle { position:absolute; min-width:128px; transform:translate(-50%, -50%); padding:.35rem .65rem; border-radius:999px; border:1px solid var(--line); background:rgba(255,253,248,0.96); color:#5b4330; font-size:.82rem; font-weight:700; box-shadow:0 4px 14px rgba(0,0,0,0.08); cursor:ns-resize; pointer-events:auto; user-select:none; touch-action:none; }
+    .preview-handle.body { color:#21543c; }
     .hidden { display:none !important; }
     pre.transcript { margin:0; min-height:220px; white-space:pre-wrap; word-wrap:break-word; border:1px solid var(--line); border-radius:12px; padding:1rem; background:#fbf8ef; }
     @media (max-width:980px) { .generation, .tools-grid, .compact, .triple { grid-template-columns:1fr; } }
@@ -147,20 +154,36 @@
                 <div class="triple">
                   <div class="field"><label for="pdf-header-y">Top Text Y Position</label><input id="pdf-header-y" type="number" min="690" max="760" step="1" /></div>
                   <div class="field"><label for="pdf-footer-y">Bottom Text Y Position</label><input id="pdf-footer-y" type="number" min="18" max="80" step="1" /></div>
+                  <div class="field"><label for="pdf-body-start-y">Body Start Y Position</label><input id="pdf-body-start-y" type="number" min="560" max="690" step="1" /></div>
+                </div>
+                <div class="triple">
                   <div id="background-field" class="field hidden"><label for="background-file">Custom Background</label><input id="background-file" type="file" accept=".png,.jpg,.jpeg" /></div>
+                  <div class="field"></div>
+                  <div class="field"></div>
                 </div>
               </div>
-              <div class="actions" style="margin-top:1rem;"><button id="save-button" class="button" type="button">Save Changes</button><button id="preview-pdf-button" class="button secondary" type="button">Preview PDF</button><a id="download-pdf" class="download-link" href="#">Download PDF</a><a id="download-png" class="download-link" href="#">Download PNG</a><a id="download-docx" class="download-link" href="#">Download DOCX</a><span id="save-status" class="helper"></span></div>
+              <div class="actions" style="margin-top:1rem;"><button id="save-button" class="button" type="button">Save Changes</button><button id="preview-pdf-button" class="button secondary" type="button">Preview PDF</button><button id="reset-layout-button" class="button ghost" type="button">Reset Layout</button><a id="download-pdf" class="download-link" href="#">Download PDF</a><a id="download-png" class="download-link" href="#">Download PNG</a><a id="download-docx" class="download-link" href="#">Download DOCX</a><span id="save-status" class="helper"></span></div>
               <div id="pdf-preview-card" class="card hidden" style="margin-top:1rem; background:#fbf8ef; box-shadow:none;">
                 <div class="section-header">
                   <div>
                     <h3 style="margin:0;">PDF Preview</h3>
-                    <p class="helper" style="margin:.35rem 0 0;">Refreshes from your latest saved settings.</p>
+                    <p class="helper" style="margin:.35rem 0 0;">Refreshes from your latest saved settings. Drag the guides to move the header, footer, and first-page body start.</p>
                   </div>
                   <button id="close-preview-button" class="button ghost" type="button">Hide Preview</button>
                 </div>
                 <div class="preview-shell">
-                  <iframe id="pdf-preview-frame" class="preview-frame" title="PDF Preview"></iframe>
+                  <div id="pdf-preview-stage" class="preview-stage">
+                    <img id="pdf-preview-image" class="preview-image" alt="PDF Preview" />
+                    <div id="pdf-preview-overlay" class="preview-overlay hidden">
+                      <div id="preview-guide-header" class="preview-guide"></div>
+                      <div id="preview-guide-footer" class="preview-guide footer"></div>
+                      <div id="preview-guide-body" class="preview-guide body"></div>
+                      <div id="preview-handle-header-left" class="preview-handle">Top Left</div>
+                      <div id="preview-handle-header-right" class="preview-handle">Top Right</div>
+                      <div id="preview-handle-footer" class="preview-handle">Bottom Text</div>
+                      <div id="preview-handle-body" class="preview-handle body">Body Start</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -217,8 +240,18 @@
     const saveStatus = document.getElementById("save-status");
     const previewPdfButton = document.getElementById("preview-pdf-button");
     const closePreviewButton = document.getElementById("close-preview-button");
+    const resetLayoutButton = document.getElementById("reset-layout-button");
     const pdfPreviewCard = document.getElementById("pdf-preview-card");
-    const pdfPreviewFrame = document.getElementById("pdf-preview-frame");
+    const pdfPreviewStage = document.getElementById("pdf-preview-stage");
+    const pdfPreviewImage = document.getElementById("pdf-preview-image");
+    const pdfPreviewOverlay = document.getElementById("pdf-preview-overlay");
+    const previewGuideHeader = document.getElementById("preview-guide-header");
+    const previewGuideFooter = document.getElementById("preview-guide-footer");
+    const previewGuideBody = document.getElementById("preview-guide-body");
+    const previewHandleHeaderLeft = document.getElementById("preview-handle-header-left");
+    const previewHandleHeaderRight = document.getElementById("preview-handle-header-right");
+    const previewHandleFooter = document.getElementById("preview-handle-footer");
+    const previewHandleBody = document.getElementById("preview-handle-body");
     const pdfLineSpacing = document.getElementById("pdf-line-spacing");
     const pdfFontSize = document.getElementById("pdf-font-size");
     const pdfBodyAlign = document.getElementById("pdf-body-align");
@@ -234,6 +267,7 @@
     const pdfFooterAlign = document.getElementById("pdf-footer-align");
     const pdfHeaderY = document.getElementById("pdf-header-y");
     const pdfFooterY = document.getElementById("pdf-footer-y");
+    const pdfBodyStartY = document.getElementById("pdf-body-start-y");
     const backgroundField = document.getElementById("background-field");
     const backgroundFile = document.getElementById("background-file");
     const historyList = document.getElementById("history-list");
@@ -256,7 +290,10 @@
     let hasCustomBackground = Boolean(initialSelectedJob && initialSelectedJob.pdf_custom_background);
     let saveInFlight = false;
     let downloadInFlight = false;
+    let previewObjectUrl = null;
+    let dragState = null;
     let editorHydratedJobId = initialSelectedJob && initialSelectedJob.id ? initialSelectedJob.id : null;
+    const DEFAULT_PDF_LAYOUT = { headerY: 738, footerY: 30, bodyStartY: 648 };
     function setMessage(text, kind = "success") { if (!text) { messageBox.className = "message"; messageBox.textContent = ""; return; } messageBox.className = `message ${kind}`; messageBox.textContent = text; }
     function switchTab(tabName) { tabButtons.forEach((button) => button.classList.toggle("active", button.dataset.tab === tabName)); tabPanels.forEach((panel) => panel.classList.toggle("active", panel.id === `tab-${tabName}`)); }
     function progressStageLabel(jobOrProgress, message = "") {
@@ -279,9 +316,78 @@
       return "Processing Transcript";
     }
     function setProgress(progress, message) { statusLine.textContent = progressStageLabel(progress, message); statusMeta.textContent = `${progress || 0}%`; progressBar.style.width = `${progress || 0}%`; }
+    function clamp(value, min, max) { return Math.min(Math.max(value, min), max); }
     function markDirty() { if (!editorShell.classList.contains("hidden")) { dirty = true; saveStatus.textContent = "Unsaved changes."; } }
+    function revokePreviewUrl() { if (previewObjectUrl) { URL.revokeObjectURL(previewObjectUrl); previewObjectUrl = null; } }
+    function setInputValue(input, value) { input.value = String(Math.round(value)); }
+    function currentPreviewMetrics() {
+      const rect = pdfPreviewStage.getBoundingClientRect();
+      return { width: rect.width || 612, height: rect.height || 792 };
+    }
+    function pdfYToPreview(y, height) {
+      return ((792 - Number(y || 0)) / 792) * height;
+    }
+    function previewToPdfY(offsetY, height) {
+      return clamp(792 - ((offsetY / Math.max(height, 1)) * 792), 0, 792);
+    }
+    function syncPreviewOverlay() {
+      if (pdfPreviewCard.classList.contains("hidden") || !pdfPreviewImage.getAttribute("src")) return;
+      const { width, height } = currentPreviewMetrics();
+      const headerOffset = pdfYToPreview(Number(pdfHeaderY.value || DEFAULT_PDF_LAYOUT.headerY), height);
+      const footerOffset = pdfYToPreview(Number(pdfFooterY.value || DEFAULT_PDF_LAYOUT.footerY), height);
+      const bodyOffset = pdfYToPreview(Number(pdfBodyStartY.value || DEFAULT_PDF_LAYOUT.bodyStartY), height);
+      previewGuideHeader.style.top = `${headerOffset}px`;
+      previewGuideFooter.style.top = `${footerOffset}px`;
+      previewGuideBody.style.top = `${bodyOffset}px`;
+      previewHandleHeaderLeft.style.left = `${Math.max(72, width * 0.17)}px`;
+      previewHandleHeaderLeft.style.top = `${headerOffset}px`;
+      previewHandleHeaderRight.style.left = `${Math.min(width - 72, width * 0.83)}px`;
+      previewHandleHeaderRight.style.top = `${headerOffset}px`;
+      previewHandleFooter.style.left = `${width / 2}px`;
+      previewHandleFooter.style.top = `${footerOffset}px`;
+      previewHandleBody.style.left = `${width / 2}px`;
+      previewHandleBody.style.top = `${bodyOffset}px`;
+      pdfPreviewOverlay.classList.remove("hidden");
+    }
+    function beginPreviewDrag(target, event) {
+      if (pdfPreviewCard.classList.contains("hidden")) return;
+      event.preventDefault();
+      dragState = { target };
+      const move = (clientY) => {
+        const rect = pdfPreviewStage.getBoundingClientRect();
+        const offsetY = clamp(clientY - rect.top, 0, rect.height || 1);
+        const pdfY = previewToPdfY(offsetY, rect.height || 1);
+        if (target === "header") {
+          setInputValue(pdfHeaderY, clamp(pdfY, 690, 760));
+        } else if (target === "footer") {
+          setInputValue(pdfFooterY, clamp(pdfY, 18, 80));
+        } else {
+          setInputValue(pdfBodyStartY, clamp(pdfY, 560, 690));
+        }
+        markDirty();
+        syncPreviewOverlay();
+      };
+      const onMove = (moveEvent) => {
+        if (!dragState) return;
+        if (moveEvent.touches && moveEvent.touches[0]) move(moveEvent.touches[0].clientY);
+        else move(moveEvent.clientY);
+      };
+      const onUp = () => {
+        dragState = null;
+        window.removeEventListener("mousemove", onMove);
+        window.removeEventListener("mouseup", onUp);
+        window.removeEventListener("touchmove", onMove);
+        window.removeEventListener("touchend", onUp);
+      };
+      window.addEventListener("mousemove", onMove);
+      window.addEventListener("mouseup", onUp);
+      window.addEventListener("touchmove", onMove, { passive: false });
+      window.addEventListener("touchend", onUp);
+      if (event.touches && event.touches[0]) move(event.touches[0].clientY);
+      else move(event.clientY);
+    }
     function updateBackgroundField() { const show = pdfBackgroundMode.value === "custom"; backgroundField.classList.toggle("hidden", !show); if (!show) { backgroundFile.value = ""; } }
-    function resetWorkspace() { activeJobId = null; currentJob = null; dirty = false; hasCustomBackground = false; editorHydratedJobId = null; createForm.reset(); setProgress(0, "Ready"); transcriptOutput.textContent = "No transcript yet."; reviewCard.classList.add("hidden"); billingCard.classList.add("hidden"); editorEmpty.classList.remove("hidden"); lockedEditorMessage.classList.add("hidden"); editorShell.classList.add("hidden"); cancelProjectButton.classList.add("hidden"); deleteProjectButton.classList.add("hidden"); saveStatus.textContent = ""; pdfPreviewCard.classList.add("hidden"); pdfPreviewFrame.removeAttribute("src"); toolsSelectedJob.textContent = "Choose a project from History or Article Generation to enable these downloaders."; [downloadTranscriptText, downloadArticleText, toolsDownloadPdf, toolsDownloadPng, toolsDownloadDocx].forEach((link) => link.classList.add("hidden")); setMessage(""); renderHistory(); }
+    function resetWorkspace() { activeJobId = null; currentJob = null; dirty = false; hasCustomBackground = false; editorHydratedJobId = null; createForm.reset(); setProgress(0, "Ready"); transcriptOutput.textContent = "No transcript yet."; reviewCard.classList.add("hidden"); billingCard.classList.add("hidden"); editorEmpty.classList.remove("hidden"); lockedEditorMessage.classList.add("hidden"); editorShell.classList.add("hidden"); cancelProjectButton.classList.add("hidden"); deleteProjectButton.classList.add("hidden"); saveStatus.textContent = ""; pdfPreviewCard.classList.add("hidden"); pdfPreviewImage.removeAttribute("src"); pdfPreviewOverlay.classList.add("hidden"); revokePreviewUrl(); toolsSelectedJob.textContent = "Choose a project from History or Article Generation to enable these downloaders."; [downloadTranscriptText, downloadArticleText, toolsDownloadPdf, toolsDownloadPng, toolsDownloadDocx].forEach((link) => link.classList.add("hidden")); setMessage(""); renderHistory(); }
     async function fetchJson(url, options = {}) { const response = await fetch(url, options); const contentType = response.headers.get("content-type") || ""; const data = contentType.includes("application/json") ? await response.json() : await response.text(); if (!response.ok) throw new Error(typeof data === "string" ? data : (data.error || "Request failed.")); return data; }
     function renderHistory() { historyList.innerHTML = ""; if (!jobs.length) { historyList.innerHTML = '<p class="helper">No projects yet.</p>'; return; } jobs.forEach((job) => { const card = document.createElement("div"); card.className = `job-card${job.id === activeJobId ? " active" : ""}`; const isCancelable = ["queued", "running", "needs_review"].includes(job.status); card.innerHTML = `<div class="chip">${job.status}</div><strong>${job.topic}</strong><div class="helper">${job.rabbi_name}</div><div class="actions"><button class="button ghost open-job" type="button">Open</button><button class="button secondary cancel-job" type="button" ${isCancelable ? "" : "disabled"}>Cancel</button><button class="button danger delete-job" type="button">Delete</button></div>`; card.querySelector(".open-job").addEventListener("click", () => { loadJob(job.id).then(() => switchTab("generation")).catch((error) => setMessage(error.message, "error")); }); card.querySelector(".cancel-job").addEventListener("click", async () => { try { await fetchJson(`/api/jobs/${job.id}/cancel`, { method: "POST" }); setMessage("Project canceled."); await refreshJobs(); if (job.id === activeJobId) await loadJob(job.id); } catch (error) { setMessage(error.message, "error"); } }); card.querySelector(".delete-job").addEventListener("click", async () => { try { await fetchJson(`/api/jobs/${job.id}`, { method: "DELETE" }); if (job.id === activeJobId) resetWorkspace(); setMessage("Project deleted."); await refreshJobs(); } catch (error) { setMessage(error.message, "error"); } }); historyList.appendChild(card); }); }
     function renderReview(items) { reviewItems.innerHTML = ""; items.forEach((item) => { const suggestion = item.clarification || (item.suggestions && item.suggestions[0]) || ""; const wrapper = document.createElement("div"); wrapper.className = "card"; wrapper.style.marginTop = ".75rem"; wrapper.innerHTML = `<p><strong>${item.raw_text}</strong></p><p class="helper">${item.context || ""}</p><div class="field"><label for="${item.id}">Clarification</label><input id="${item.id}" name="${item.id}" type="text" value="${suggestion}" placeholder="Transliteration + English" /></div>`; reviewItems.appendChild(wrapper); }); }
@@ -309,14 +415,29 @@
       return "No transcript yet.";
     }
     function bindDownloadLinks(job) { const base = `/api/jobs/${job.id}`; downloadPdf.href = `${base}/pdf`; downloadPng.href = `${base}/png`; downloadDocx.href = `${base}/docx`; toolsDownloadPdf.href = `${base}/pdf`; toolsDownloadPng.href = `${base}/png`; toolsDownloadDocx.href = `${base}/docx`; downloadTranscriptText.href = `${base}/transcript.txt`; downloadArticleText.href = `${base}/article.txt`; const links = [downloadPdf, downloadPng, downloadDocx, downloadTranscriptText, downloadArticleText, toolsDownloadPdf, toolsDownloadPng, toolsDownloadDocx]; links.forEach((link) => link.classList.toggle("hidden", Boolean(job.access_locked))); toolsSelectedJob.textContent = `Selected project: ${job.topic} by ${job.rabbi_name}`; }
-    async function refreshPdfPreview() { if (!activeJobId) throw new Error("No project is selected."); if (dirty) await saveChanges(); const response = await fetch(`/api/jobs/${activeJobId}/pdf/preview?ts=${Date.now()}`); if (!response.ok) { const contentType = response.headers.get("content-type") || ""; const data = contentType.includes("application/json") ? await response.json() : await response.text(); throw new Error(typeof data === "string" ? data : (data.error || "Preview failed.")); } const blob = await response.blob(); const objectUrl = URL.createObjectURL(blob); pdfPreviewCard.classList.remove("hidden"); pdfPreviewFrame.src = objectUrl; }
-    function hydrateEditor(job) { editorTitle.value = job.topic || ""; editorRabbi.value = job.rabbi_name || ""; editorText.value = job.edited_one_pager || job.one_pager || ""; transliterationMode.value = job.transliteration_mode || "auto"; pdfLineSpacing.value = String(job.pdf_line_spacing || 1.0); pdfFontSize.value = String(job.pdf_font_size || 12); if (!pdfFontSize.value || Number(pdfFontSize.value) <= 0) pdfFontSize.value = "12"; pdfBodyAlign.value = job.pdf_body_align || "left"; pdfBackgroundMode.value = job.pdf_background_mode || "default"; pdfHeaderLeft.value = job.pdf_header_left || "Torah Center"; pdfHeaderRight.value = job.pdf_header_right || "Torah from our Rabbis"; pdfFooterText.value = job.pdf_footer_text || "Torah Center"; pdfHeaderLeftSize.value = job.pdf_header_left_size || 15; pdfHeaderRightSize.value = job.pdf_header_right_size || 14; pdfFooterSize.value = job.pdf_footer_size || 10; pdfHeaderLeftAlign.value = job.pdf_header_left_align || "left"; pdfHeaderRightAlign.value = job.pdf_header_right_align || "right"; pdfFooterAlign.value = job.pdf_footer_align || "center"; pdfHeaderY.value = job.pdf_header_y || 738; pdfFooterY.value = job.pdf_footer_y || 30; hasCustomBackground = Boolean(job.pdf_custom_background); updateBackgroundField(); editorHydratedJobId = job.id; }
-    function renderJob(job, options = {}) { const forceEditor = Boolean(options.forceEditor); currentJob = job; activeJobId = job.id; cancelProjectButton.classList.toggle("hidden", !["queued", "running", "needs_review"].includes(job.status)); deleteProjectButton.classList.remove("hidden"); statusLine.textContent = progressStageLabel(job); statusMeta.textContent = `${job.progress || 0}%`; progressBar.style.width = `${job.progress || 0}%`; transcriptOutput.textContent = transcriptDisplayText(job); if (job.status === "needs_review") { reviewCard.classList.remove("hidden"); renderReview(job.review_items || []); } else { reviewCard.classList.add("hidden"); } billingCard.classList.toggle("hidden", !(job.access_locked && job.status === "completed")); billingStatus.textContent = job.access_locked ? `Unlock this completed article for $${((job.single_unlock_price_cents || 500) / 100).toFixed(2)} or subscribe for $${((job.monthly_price_cents || 1500) / 100).toFixed(2)}/month.` : "Completed articles stay hidden until payment or an active subscription unlocks them."; editorEmpty.classList.add("hidden"); lockedEditorMessage.classList.toggle("hidden", !job.access_locked); editorShell.classList.toggle("hidden", Boolean(job.access_locked)); if (!job.access_locked && (forceEditor || editorHydratedJobId !== job.id || !dirty)) { hydrateEditor(job); if (forceEditor) { dirty = false; saveStatus.textContent = ""; } } bindDownloadLinks(job); saveButton.disabled = false; saveButton.textContent = "Save Changes"; if (job.status === "failed" && job.error) setMessage(job.error, "error"); else if (job.status === "canceled") setMessage("Project canceled.", "success"); renderHistory(); }
+    async function refreshPdfPreview() {
+      if (!activeJobId) throw new Error("No project is selected.");
+      if (dirty) await saveChanges();
+      const response = await fetch(`/api/jobs/${activeJobId}/png/preview?ts=${Date.now()}`);
+      if (!response.ok) {
+        const contentType = response.headers.get("content-type") || "";
+        const data = contentType.includes("application/json") ? await response.json() : await response.text();
+        throw new Error(typeof data === "string" ? data : (data.error || "Preview failed."));
+      }
+      const blob = await response.blob();
+      revokePreviewUrl();
+      previewObjectUrl = URL.createObjectURL(blob);
+      pdfPreviewCard.classList.remove("hidden");
+      pdfPreviewImage.src = previewObjectUrl;
+      syncPreviewOverlay();
+    }
+    function hydrateEditor(job) { editorTitle.value = job.topic || ""; editorRabbi.value = job.rabbi_name || ""; editorText.value = job.edited_one_pager || job.one_pager || ""; transliterationMode.value = job.transliteration_mode || "auto"; pdfLineSpacing.value = String(job.pdf_line_spacing || 1.0); pdfFontSize.value = String(job.pdf_font_size || 12); if (!pdfFontSize.value || Number(pdfFontSize.value) <= 0) pdfFontSize.value = "12"; pdfBodyAlign.value = job.pdf_body_align || "left"; pdfBackgroundMode.value = job.pdf_background_mode || "default"; pdfHeaderLeft.value = job.pdf_header_left || "Torah Center"; pdfHeaderRight.value = job.pdf_header_right || "Torah from our Rabbis"; pdfFooterText.value = job.pdf_footer_text || "Torah Center"; pdfHeaderLeftSize.value = job.pdf_header_left_size || 15; pdfHeaderRightSize.value = job.pdf_header_right_size || 14; pdfFooterSize.value = job.pdf_footer_size || 10; pdfHeaderLeftAlign.value = job.pdf_header_left_align || "left"; pdfHeaderRightAlign.value = job.pdf_header_right_align || "right"; pdfFooterAlign.value = job.pdf_footer_align || "center"; pdfHeaderY.value = job.pdf_header_y || DEFAULT_PDF_LAYOUT.headerY; pdfFooterY.value = job.pdf_footer_y || DEFAULT_PDF_LAYOUT.footerY; pdfBodyStartY.value = job.pdf_body_start_y || DEFAULT_PDF_LAYOUT.bodyStartY; hasCustomBackground = Boolean(job.pdf_custom_background); updateBackgroundField(); editorHydratedJobId = job.id; syncPreviewOverlay(); }
+    function renderJob(job, options = {}) { const forceEditor = Boolean(options.forceEditor); const previousJobId = currentJob && currentJob.id ? currentJob.id : null; currentJob = job; activeJobId = job.id; cancelProjectButton.classList.toggle("hidden", !["queued", "running", "needs_review"].includes(job.status)); deleteProjectButton.classList.remove("hidden"); statusLine.textContent = progressStageLabel(job); statusMeta.textContent = `${job.progress || 0}%`; progressBar.style.width = `${job.progress || 0}%`; transcriptOutput.textContent = transcriptDisplayText(job); if (job.status === "needs_review") { reviewCard.classList.remove("hidden"); renderReview(job.review_items || []); } else { reviewCard.classList.add("hidden"); } billingCard.classList.toggle("hidden", !(job.access_locked && job.status === "completed")); billingStatus.textContent = job.access_locked ? `Unlock this completed article for $${((job.single_unlock_price_cents || 500) / 100).toFixed(2)} or subscribe for $${((job.monthly_price_cents || 1500) / 100).toFixed(2)}/month.` : "Completed articles stay hidden until payment or an active subscription unlocks them."; editorEmpty.classList.add("hidden"); lockedEditorMessage.classList.toggle("hidden", !job.access_locked); editorShell.classList.toggle("hidden", Boolean(job.access_locked)); if (job.access_locked || (previousJobId && previousJobId !== job.id)) { pdfPreviewCard.classList.add("hidden"); pdfPreviewImage.removeAttribute("src"); pdfPreviewOverlay.classList.add("hidden"); revokePreviewUrl(); } if (!job.access_locked && (forceEditor || editorHydratedJobId !== job.id || !dirty)) { hydrateEditor(job); if (forceEditor) { dirty = false; saveStatus.textContent = ""; } } bindDownloadLinks(job); saveButton.disabled = false; saveButton.textContent = "Save Changes"; if (job.status === "failed" && job.error) setMessage(job.error, "error"); else if (job.status === "canceled") setMessage("Project canceled.", "success"); renderHistory(); }
     async function refreshJobs() { const data = await fetchJson("/api/jobs"); jobs = data.jobs || []; renderHistory(); return jobs; }
     async function loadJob(jobId, options = {}) { const job = await fetchJson(`/api/jobs/${jobId}`); renderJob(job, { forceEditor: options.forceEditor !== false }); if (["queued", "running"].includes(job.status)) pollJob(job.id); }
     async function pollJob(jobId) { activeJobId = jobId; while (activeJobId === jobId) { const job = await fetchJson(`/api/jobs/${jobId}`); renderJob(job, { forceEditor: false }); if (!["queued", "running"].includes(job.status)) return; await new Promise((resolve) => setTimeout(resolve, 2000)); } }
     async function uploadBackgroundIfNeeded() { if (pdfBackgroundMode.value !== "custom") return; if (backgroundFile.files.length) { const formData = new FormData(); formData.append("background", backgroundFile.files[0]); await fetchJson(`/api/jobs/${activeJobId}/background`, { method: "POST", body: formData }); hasCustomBackground = true; backgroundFile.value = ""; } else if (!hasCustomBackground) { throw new Error("Choose a custom background before saving or downloading."); } }
-    async function saveChanges() { if (!activeJobId) throw new Error("No project is selected."); if (saveInFlight) return; saveInFlight = true; saveButton.disabled = true; saveButton.textContent = "Saving..."; saveStatus.textContent = "Saving changes..."; try { const requestedFontSize = Number(String(pdfFontSize.value || 12).replace(",", ".")); const requestedLineSpacing = Number(String(pdfLineSpacing.value || 1).replace(",", ".")); const normalizedFontSize = String(requestedFontSize > 0 ? requestedFontSize : 12); const normalizedLineSpacing = String(requestedLineSpacing > 0 ? requestedLineSpacing : 1); pdfFontSize.value = normalizedFontSize; pdfLineSpacing.value = normalizedLineSpacing; await uploadBackgroundIfNeeded(); await fetchJson(`/api/jobs/${activeJobId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ topic: editorTitle.value.trim(), edited_one_pager: editorText.value.trim(), transliteration_mode: transliterationMode.value, pdf_line_spacing: normalizedLineSpacing, pdf_font_size: normalizedFontSize, pdf_body_align: pdfBodyAlign.value, pdf_background_mode: pdfBackgroundMode.value, pdf_header_left: pdfHeaderLeft.value.trim(), pdf_header_right: pdfHeaderRight.value.trim(), pdf_footer_text: pdfFooterText.value.trim(), pdf_header_left_size: pdfHeaderLeftSize.value, pdf_header_right_size: pdfHeaderRightSize.value, pdf_footer_size: pdfFooterSize.value, pdf_header_left_align: pdfHeaderLeftAlign.value, pdf_header_right_align: pdfHeaderRightAlign.value, pdf_footer_align: pdfFooterAlign.value, pdf_header_y: pdfHeaderY.value, pdf_footer_y: pdfFooterY.value }) }); dirty = false; saveStatus.textContent = "Changes saved."; setMessage("Changes saved."); await loadJob(activeJobId, { forceEditor: true }); } finally { saveInFlight = false; saveButton.disabled = false; saveButton.textContent = "Save Changes"; } }
+    async function saveChanges() { if (!activeJobId) throw new Error("No project is selected."); if (saveInFlight) return; saveInFlight = true; saveButton.disabled = true; saveButton.textContent = "Saving..."; saveStatus.textContent = "Saving changes..."; try { const requestedFontSize = Number(String(pdfFontSize.value || 12).replace(",", ".")); const requestedLineSpacing = Number(String(pdfLineSpacing.value || 1).replace(",", ".")); const normalizedFontSize = String(requestedFontSize > 0 ? requestedFontSize : 12); const normalizedLineSpacing = String(requestedLineSpacing > 0 ? requestedLineSpacing : 1); pdfFontSize.value = normalizedFontSize; pdfLineSpacing.value = normalizedLineSpacing; await uploadBackgroundIfNeeded(); await fetchJson(`/api/jobs/${activeJobId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ topic: editorTitle.value.trim(), edited_one_pager: editorText.value.trim(), transliteration_mode: transliterationMode.value, pdf_line_spacing: normalizedLineSpacing, pdf_font_size: normalizedFontSize, pdf_body_align: pdfBodyAlign.value, pdf_background_mode: pdfBackgroundMode.value, pdf_header_left: pdfHeaderLeft.value.trim(), pdf_header_right: pdfHeaderRight.value.trim(), pdf_footer_text: pdfFooterText.value.trim(), pdf_header_left_size: pdfHeaderLeftSize.value, pdf_header_right_size: pdfHeaderRightSize.value, pdf_footer_size: pdfFooterSize.value, pdf_header_left_align: pdfHeaderLeftAlign.value, pdf_header_right_align: pdfHeaderRightAlign.value, pdf_footer_align: pdfFooterAlign.value, pdf_header_y: pdfHeaderY.value, pdf_footer_y: pdfFooterY.value, pdf_body_start_y: pdfBodyStartY.value }) }); dirty = false; saveStatus.textContent = "Changes saved."; setMessage("Changes saved."); await loadJob(activeJobId, { forceEditor: true }); if (!pdfPreviewCard.classList.contains("hidden")) syncPreviewOverlay(); } finally { saveInFlight = false; saveButton.disabled = false; saveButton.textContent = "Save Changes"; } }
     async function downloadWithServerName(url, fallbackName) { if (downloadInFlight) return; downloadInFlight = true; try { if (dirty) await saveChanges(); const response = await fetch(url); if (!response.ok) { const contentType = response.headers.get("content-type") || ""; const data = contentType.includes("application/json") ? await response.json() : await response.text(); throw new Error(typeof data === "string" ? data : (data.error || "Download failed.")); } const blob = await response.blob(); const objectUrl = URL.createObjectURL(blob); const disposition = response.headers.get("content-disposition") || ""; const utfMatch = disposition.match(/filename\\*=UTF-8''([^;]+)/i); const match = disposition.match(/filename="?([^";]+)"?/i); const suggestedName = utfMatch ? decodeURIComponent(utfMatch[1]) : (match ? match[1] : fallbackName); const anchor = document.createElement("a"); anchor.href = objectUrl; anchor.download = suggestedName; document.body.appendChild(anchor); anchor.click(); anchor.remove(); setTimeout(() => URL.revokeObjectURL(objectUrl), 1000); } finally { downloadInFlight = false; } }
     async function downloadArtifact(kind) { if (!activeJobId) throw new Error("Open a project before downloading."); const path = kind === "transcript" ? "transcript.txt" : kind === "article" ? "article.txt" : kind; const fallback = kind === "pdf" ? "article.pdf" : kind === "png" ? "article.png" : kind === "docx" ? "article.docx" : kind === "transcript" ? "transcript.txt" : "article.txt"; await downloadWithServerName(`/api/jobs/${activeJobId}/${path}`, fallback); }
     async function loadLibrary() { const data = await fetchJson("/api/tools/hebrew-terms"); libraryJson.value = JSON.stringify(data.entries || [], null, 2); }
@@ -329,7 +450,8 @@
     reviewForm.addEventListener("submit", async (event) => { event.preventDefault(); try { const answers = {}; reviewForm.querySelectorAll("input[type='text']").forEach((input) => { answers[input.name] = input.value.trim(); }); await fetchJson(`/api/jobs/${activeJobId}/review`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ answers }) }); setMessage("Clarifications saved."); await pollJob(activeJobId); } catch (error) { setMessage(error.message, "error"); } });
     saveButton.addEventListener("click", async () => { try { await saveChanges(); } catch (error) { saveStatus.textContent = "Save failed."; setMessage(error.message, "error"); } });
     previewPdfButton.addEventListener("click", async () => { try { await refreshPdfPreview(); } catch (error) { setMessage(error.message, "error"); } });
-    closePreviewButton.addEventListener("click", () => { pdfPreviewCard.classList.add("hidden"); pdfPreviewFrame.removeAttribute("src"); });
+    closePreviewButton.addEventListener("click", () => { pdfPreviewCard.classList.add("hidden"); pdfPreviewImage.removeAttribute("src"); pdfPreviewOverlay.classList.add("hidden"); revokePreviewUrl(); });
+    resetLayoutButton.addEventListener("click", () => { setInputValue(pdfHeaderY, DEFAULT_PDF_LAYOUT.headerY); setInputValue(pdfFooterY, DEFAULT_PDF_LAYOUT.footerY); setInputValue(pdfBodyStartY, DEFAULT_PDF_LAYOUT.bodyStartY); markDirty(); syncPreviewOverlay(); });
     nextProjectButton.addEventListener("click", () => { resetWorkspace(); switchTab("generation"); });
     cancelProjectButton.addEventListener("click", async () => { if (!activeJobId) return; try { await fetchJson(`/api/jobs/${activeJobId}/cancel`, { method: "POST" }); setMessage("Project canceled."); await loadJob(activeJobId); } catch (error) { setMessage(error.message, "error"); } });
     deleteProjectButton.addEventListener("click", async () => { if (!activeJobId) return; try { await fetchJson(`/api/jobs/${activeJobId}`, { method: "DELETE" }); setMessage("Project deleted."); await refreshJobs(); resetWorkspace(); } catch (error) { setMessage(error.message, "error"); } });
@@ -337,8 +459,12 @@
     saveLibraryButton.addEventListener("click", async () => { try { const parsed = JSON.parse(libraryJson.value || "[]"); await fetchJson("/api/tools/hebrew-terms", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ entries: parsed }) }); setMessage("Hebrew terms library saved."); await loadLibrary(); } catch (error) { setMessage(error.message, "error"); } });
     unlockJobButton.addEventListener("click", async () => { try { await beginCheckout("job_unlock"); } catch (error) { setMessage(error.message, "error"); } });
     subscribeButton.addEventListener("click", async () => { try { await beginCheckout("subscription"); } catch (error) { setMessage(error.message, "error"); } });
-    [editorTitle, editorText, transliterationMode, pdfLineSpacing, pdfFontSize, pdfBodyAlign, pdfBackgroundMode, pdfHeaderLeft, pdfHeaderRight, pdfFooterText, pdfHeaderLeftSize, pdfHeaderRightSize, pdfFooterSize, pdfHeaderLeftAlign, pdfHeaderRightAlign, pdfFooterAlign, pdfHeaderY, pdfFooterY, backgroundFile].forEach((element) => { element.addEventListener("input", markDirty); element.addEventListener("change", markDirty); });
+    [editorTitle, editorText, transliterationMode, pdfLineSpacing, pdfFontSize, pdfBodyAlign, pdfBackgroundMode, pdfHeaderLeft, pdfHeaderRight, pdfFooterText, pdfHeaderLeftSize, pdfHeaderRightSize, pdfFooterSize, pdfHeaderLeftAlign, pdfHeaderRightAlign, pdfFooterAlign, pdfHeaderY, pdfFooterY, pdfBodyStartY, backgroundFile].forEach((element) => { element.addEventListener("input", markDirty); element.addEventListener("change", markDirty); });
     pdfBackgroundMode.addEventListener("change", updateBackgroundField);
+    [pdfHeaderY, pdfFooterY, pdfBodyStartY].forEach((element) => { element.addEventListener("input", syncPreviewOverlay); element.addEventListener("change", syncPreviewOverlay); });
+    [[previewHandleHeaderLeft, "header"], [previewHandleHeaderRight, "header"], [previewHandleFooter, "footer"], [previewHandleBody, "body"]].forEach(([element, target]) => { element.addEventListener("mousedown", (event) => beginPreviewDrag(target, event)); element.addEventListener("touchstart", (event) => beginPreviewDrag(target, event), { passive: false }); });
+    window.addEventListener("resize", syncPreviewOverlay);
+    pdfPreviewImage.addEventListener("load", syncPreviewOverlay);
     downloadPdf.addEventListener("click", async (event) => { event.preventDefault(); try { await downloadArtifact("pdf"); } catch (error) { setMessage(error.message, "error"); } });
     downloadPng.addEventListener("click", async (event) => { event.preventDefault(); try { await downloadArtifact("png"); } catch (error) { setMessage(error.message, "error"); } });
     toolsDownloadPdf.addEventListener("click", async (event) => { event.preventDefault(); try { await downloadArtifact("pdf"); } catch (error) { setMessage(error.message, "error"); } });
