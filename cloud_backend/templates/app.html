@@ -52,6 +52,9 @@
     .preview-guide.body { left:9%; right:9%; border-top:2px dashed rgba(47, 107, 80, 0.4); }
     .preview-handle { position:absolute; min-width:128px; transform:translate(-50%, -50%); padding:.35rem .65rem; border-radius:999px; border:1px solid var(--line); background:rgba(255,253,248,0.96); color:#5b4330; font-size:.82rem; font-weight:700; box-shadow:0 4px 14px rgba(0,0,0,0.08); cursor:ns-resize; pointer-events:auto; user-select:none; touch-action:none; }
     .preview-handle.body { color:#21543c; }
+    .char-tools { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; margin:.45rem 0 .6rem; }
+    .char-chip { border:1px solid var(--line); border-radius:999px; background:white; color:#5b4330; padding:.45rem .75rem; font:inherit; font-weight:700; cursor:pointer; }
+    .char-swatch { display:inline-flex; align-items:center; justify-content:center; min-width:2.25rem; padding:.25rem .55rem; border-radius:999px; border:1px solid var(--line); background:#fbf8ef; color:#5b4330; font-size:1rem; }
     .hidden { display:none !important; }
     pre.transcript { margin:0; min-height:220px; white-space:pre-wrap; word-wrap:break-word; border:1px solid var(--line); border-radius:12px; padding:1rem; background:#fbf8ef; }
     @media (max-width:980px) { .generation, .tools-grid, .compact, .triple { grid-template-columns:1fr; } }
@@ -123,7 +126,19 @@
                 <div class="field"><label for="editor-title">Article Title</label><input id="editor-title" type="text" /></div>
                 <div class="field"><label for="editor-rabbi">Speaker / Rabbi</label><input id="editor-rabbi" type="text" disabled /></div>
               </div>
-              <div class="field"><label for="editor-text">Article Text</label><textarea id="editor-text" style="min-height:360px;"></textarea></div>
+              <div class="field">
+                <label for="editor-text">Article Text</label>
+                <div class="char-tools">
+                  <button id="insert-upper-chet" class="char-chip" type="button">Insert Ḥ</button>
+                  <button id="insert-lower-chet" class="char-chip" type="button">Insert ḥ</button>
+                  <button id="copy-upper-chet" class="char-chip" type="button">Copy Ḥ</button>
+                  <button id="copy-lower-chet" class="char-chip" type="button">Copy ḥ</button>
+                  <span class="helper">Pasteable characters:</span>
+                  <span class="char-swatch">Ḥ</span>
+                  <span class="char-swatch">ḥ</span>
+                </div>
+                <textarea id="editor-text" style="min-height:360px;"></textarea>
+              </div>
               <div class="card" style="background:#fbf8ef; box-shadow:none;">
                 <h3 style="margin-top:0;">PDF Design</h3>
                 <div class="compact">
@@ -236,6 +251,10 @@
     const editorTitle = document.getElementById("editor-title");
     const editorRabbi = document.getElementById("editor-rabbi");
     const editorText = document.getElementById("editor-text");
+    const insertUpperChetButton = document.getElementById("insert-upper-chet");
+    const insertLowerChetButton = document.getElementById("insert-lower-chet");
+    const copyUpperChetButton = document.getElementById("copy-upper-chet");
+    const copyLowerChetButton = document.getElementById("copy-lower-chet");
     const saveButton = document.getElementById("save-button");
     const saveStatus = document.getElementById("save-status");
     const previewPdfButton = document.getElementById("preview-pdf-button");
@@ -330,6 +349,18 @@
     function previewToPdfY(offsetY, height) {
       return clamp(792 - ((offsetY / Math.max(height, 1)) * 792), 0, 792);
     }
+    function displayChetText(text) {
+      return String(text || "").replace(/H\u0323/g, "\u1e24").replace(/h\u0323/g, "\u1e25");
+    }
+    function insertTextAtCursor(input, text) {
+      const start = input.selectionStart ?? input.value.length;
+      const end = input.selectionEnd ?? input.value.length;
+      input.value = `${input.value.slice(0, start)}${text}${input.value.slice(end)}`;
+      const caret = start + text.length;
+      input.focus();
+      input.setSelectionRange(caret, caret);
+      markDirty();
+    }
     function syncPreviewOverlay() {
       if (pdfPreviewCard.classList.contains("hidden") || !pdfPreviewImage.getAttribute("src")) return;
       const { width, height } = currentPreviewMetrics();
@@ -400,14 +431,14 @@
         return "Transcript will be available after unlock or active subscription.";
       }
       if (job.final_transcript) {
-        return job.final_transcript;
+        return displayChetText(job.final_transcript);
       }
       const isAdmin = Boolean(job.is_admin);
       if (isAdmin && job.status === "needs_review" && job.raw_transcript && !hasPromptLeak(job.raw_transcript)) {
-        return job.raw_transcript;
+        return displayChetText(job.raw_transcript);
       }
       if (isAdmin && job.raw_transcript && !hasPromptLeak(job.raw_transcript) && !["queued", "running"].includes(job.status)) {
-        return job.raw_transcript;
+        return displayChetText(job.raw_transcript);
       }
       if (["queued", "running", "needs_review"].includes(job.status)) {
         return "Transcript is being prepared...";
@@ -431,7 +462,7 @@
       pdfPreviewImage.src = previewObjectUrl;
       syncPreviewOverlay();
     }
-    function hydrateEditor(job) { editorTitle.value = job.topic || ""; editorRabbi.value = job.rabbi_name || ""; editorText.value = job.edited_one_pager || job.one_pager || ""; transliterationMode.value = job.transliteration_mode || "auto"; pdfLineSpacing.value = String(job.pdf_line_spacing || 1.0); pdfFontSize.value = String(job.pdf_font_size || 12); if (!pdfFontSize.value || Number(pdfFontSize.value) <= 0) pdfFontSize.value = "12"; pdfBodyAlign.value = job.pdf_body_align || "left"; pdfBackgroundMode.value = job.pdf_background_mode || "default"; pdfHeaderLeft.value = job.pdf_header_left || "Torah Center"; pdfHeaderRight.value = job.pdf_header_right || "Torah from our Rabbis"; pdfFooterText.value = job.pdf_footer_text || "Torah Center"; pdfHeaderLeftSize.value = job.pdf_header_left_size || 15; pdfHeaderRightSize.value = job.pdf_header_right_size || 14; pdfFooterSize.value = job.pdf_footer_size || 10; pdfHeaderLeftAlign.value = job.pdf_header_left_align || "left"; pdfHeaderRightAlign.value = job.pdf_header_right_align || "right"; pdfFooterAlign.value = job.pdf_footer_align || "center"; pdfHeaderY.value = job.pdf_header_y || DEFAULT_PDF_LAYOUT.headerY; pdfFooterY.value = job.pdf_footer_y || DEFAULT_PDF_LAYOUT.footerY; pdfBodyStartY.value = job.pdf_body_start_y || DEFAULT_PDF_LAYOUT.bodyStartY; hasCustomBackground = Boolean(job.pdf_custom_background); updateBackgroundField(); editorHydratedJobId = job.id; syncPreviewOverlay(); }
+    function hydrateEditor(job) { editorTitle.value = displayChetText(job.topic || ""); editorRabbi.value = displayChetText(job.rabbi_name || ""); editorText.value = displayChetText(job.edited_one_pager || job.one_pager || ""); transliterationMode.value = job.transliteration_mode || "auto"; pdfLineSpacing.value = String(job.pdf_line_spacing || 1.0); pdfFontSize.value = String(job.pdf_font_size || 12); if (!pdfFontSize.value || Number(pdfFontSize.value) <= 0) pdfFontSize.value = "12"; pdfBodyAlign.value = job.pdf_body_align || "left"; pdfBackgroundMode.value = job.pdf_background_mode || "default"; pdfHeaderLeft.value = displayChetText(job.pdf_header_left || "Torah Center"); pdfHeaderRight.value = displayChetText(job.pdf_header_right || "Torah from our Rabbis"); pdfFooterText.value = displayChetText(job.pdf_footer_text || "Torah Center"); pdfHeaderLeftSize.value = job.pdf_header_left_size || 15; pdfHeaderRightSize.value = job.pdf_header_right_size || 14; pdfFooterSize.value = job.pdf_footer_size || 10; pdfHeaderLeftAlign.value = job.pdf_header_left_align || "left"; pdfHeaderRightAlign.value = job.pdf_header_right_align || "right"; pdfFooterAlign.value = job.pdf_footer_align || "center"; pdfHeaderY.value = job.pdf_header_y || DEFAULT_PDF_LAYOUT.headerY; pdfFooterY.value = job.pdf_footer_y || DEFAULT_PDF_LAYOUT.footerY; pdfBodyStartY.value = job.pdf_body_start_y || DEFAULT_PDF_LAYOUT.bodyStartY; hasCustomBackground = Boolean(job.pdf_custom_background); updateBackgroundField(); editorHydratedJobId = job.id; syncPreviewOverlay(); }
     function renderJob(job, options = {}) { const forceEditor = Boolean(options.forceEditor); const previousJobId = currentJob && currentJob.id ? currentJob.id : null; currentJob = job; activeJobId = job.id; cancelProjectButton.classList.toggle("hidden", !["queued", "running", "needs_review"].includes(job.status)); deleteProjectButton.classList.remove("hidden"); statusLine.textContent = progressStageLabel(job); statusMeta.textContent = `${job.progress || 0}%`; progressBar.style.width = `${job.progress || 0}%`; transcriptOutput.textContent = transcriptDisplayText(job); if (job.status === "needs_review") { reviewCard.classList.remove("hidden"); renderReview(job.review_items || []); } else { reviewCard.classList.add("hidden"); } billingCard.classList.toggle("hidden", !(job.access_locked && job.status === "completed")); billingStatus.textContent = job.access_locked ? `Unlock this completed article for $${((job.single_unlock_price_cents || 500) / 100).toFixed(2)} or subscribe for $${((job.monthly_price_cents || 1500) / 100).toFixed(2)}/month.` : "Completed articles stay hidden until payment or an active subscription unlocks them."; editorEmpty.classList.add("hidden"); lockedEditorMessage.classList.toggle("hidden", !job.access_locked); editorShell.classList.toggle("hidden", Boolean(job.access_locked)); if (job.access_locked || (previousJobId && previousJobId !== job.id)) { pdfPreviewCard.classList.add("hidden"); pdfPreviewImage.removeAttribute("src"); pdfPreviewOverlay.classList.add("hidden"); revokePreviewUrl(); } if (!job.access_locked && (forceEditor || editorHydratedJobId !== job.id || !dirty)) { hydrateEditor(job); if (forceEditor) { dirty = false; saveStatus.textContent = ""; } } bindDownloadLinks(job); saveButton.disabled = false; saveButton.textContent = "Save Changes"; if (job.status === "failed" && job.error) setMessage(job.error, "error"); else if (job.status === "canceled") setMessage("Project canceled.", "success"); renderHistory(); }
     async function refreshJobs() { const data = await fetchJson("/api/jobs"); jobs = data.jobs || []; renderHistory(); return jobs; }
     async function loadJob(jobId, options = {}) { const job = await fetchJson(`/api/jobs/${jobId}`); renderJob(job, { forceEditor: options.forceEditor !== false }); if (["queued", "running"].includes(job.status)) pollJob(job.id); }
@@ -452,6 +483,24 @@
     previewPdfButton.addEventListener("click", async () => { try { await refreshPdfPreview(); } catch (error) { setMessage(error.message, "error"); } });
     closePreviewButton.addEventListener("click", () => { pdfPreviewCard.classList.add("hidden"); pdfPreviewImage.removeAttribute("src"); pdfPreviewOverlay.classList.add("hidden"); revokePreviewUrl(); });
     resetLayoutButton.addEventListener("click", () => { setInputValue(pdfHeaderY, DEFAULT_PDF_LAYOUT.headerY); setInputValue(pdfFooterY, DEFAULT_PDF_LAYOUT.footerY); setInputValue(pdfBodyStartY, DEFAULT_PDF_LAYOUT.bodyStartY); markDirty(); syncPreviewOverlay(); });
+    insertUpperChetButton.addEventListener("click", () => insertTextAtCursor(editorText, "Ḥ"));
+    insertLowerChetButton.addEventListener("click", () => insertTextAtCursor(editorText, "ḥ"));
+    copyUpperChetButton.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText("Ḥ");
+        setMessage("Ḥ copied.");
+      } catch (error) {
+        setMessage("Could not copy Ḥ automatically. You can still paste it from the button row.", "error");
+      }
+    });
+    copyLowerChetButton.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText("ḥ");
+        setMessage("ḥ copied.");
+      } catch (error) {
+        setMessage("Could not copy ḥ automatically. You can still paste it from the button row.", "error");
+      }
+    });
     nextProjectButton.addEventListener("click", () => { resetWorkspace(); switchTab("generation"); });
     cancelProjectButton.addEventListener("click", async () => { if (!activeJobId) return; try { await fetchJson(`/api/jobs/${activeJobId}/cancel`, { method: "POST" }); setMessage("Project canceled."); await loadJob(activeJobId); } catch (error) { setMessage(error.message, "error"); } });
     deleteProjectButton.addEventListener("click", async () => { if (!activeJobId) return; try { await fetchJson(`/api/jobs/${activeJobId}`, { method: "DELETE" }); setMessage("Project deleted."); await refreshJobs(); resetWorkspace(); } catch (error) { setMessage(error.message, "error"); } });
