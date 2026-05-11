@@ -1,0 +1,4 @@
+businessName,contactName,email,phone,website,state,source,segment,notes,consentStatus,relationshipStatus,doNotContact
+North Star Studio LLC,Maya Founder,maya@example.test,212-555-0101,https://example.test,NY,event,founder,Asked for checklist,opted_in,none,false
+Garden State Services,Noah Owner,noah@example.test,201-555-0102,,NJ,referral,existing_business_contracts,Manual note only,existing_relationship,professional_contact,false
+BrightMark Goods,Iris Brand,iris@example.test,,,NY,newsletter,trademark_brand,Interested in checklist,unknown,none,false
