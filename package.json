@@ -1,0 +1,50 @@
+{
+  "name": "legal-outreach-intake",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prisma:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^2.4.3",
+    "clsx": "^2.1.1",
+    "csv-parse": "^5.5.6",
+    "csv-stringify": "^6.5.1",
+    "date-fns": "^3.6.0",
+    "jsonwebtoken": "^9.0.2",
+    "next": "^14.2.33",
+    "pdfkit": "^0.15.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^20.19.25",
+    "@types/pdfkit": "^0.13.9",
+    "@types/react": "^18.3.27",
+    "@types/react-dom": "^18.3.7",
+    "autoprefixer": "^10.4.22",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^14.2.33",
+    "postcss": "^8.5.6",
+    "prisma": "^5.22.0",
+    "tailwindcss": "^3.4.18",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.9"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  }
+}
